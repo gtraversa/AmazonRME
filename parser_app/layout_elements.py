@@ -50,17 +50,29 @@ def make_window(full_combo_values = []):
 
         ],
     ]
+    selection_full_display = [
+        [
+            sg.Text('Select file'),
+        ],
+        [
+            sg.Combo(values=full_combo_values,
+            auto_size_text = True,
+            enable_events=True, 
+            key='-PARSED FILE SELECT-'
+            ),
+        ],
+        [
+            sg.Button(button_text = 'Clear',key = '-CLEAR FULL OUTPUT-')
+        ],
+    ]
 
 
     full_display_column = [
         [
             sg.Output(
-               size=(40, 6), key='-FULL OUTPUT-'
+               size=(85, 20), key='-FULL OUTPUT-'
             ),
-        ],
-        [
-            sg.Text('Select file'),
-            sg.Combo(values=full_combo_values,auto_size_text = True, enable_events=True, key='-PARSED FILE SELECT-')
+            sg.Column(selection_full_display,vertical_alignment = 'top'),
         ],
     ]
 
@@ -70,11 +82,14 @@ def make_window(full_combo_values = []):
         [
             sg.Column(file_list_column),
             sg.VSeperator(),
-            sg.Column(keyword_list_column),
-            sg.VSeparator(),
-            sg.TabGroup([[
-                sg.Tab('Full', full_display_column)
-            ]]),
-        ]
+            sg.Column(keyword_list_column) 
+        ],
+        [sg.TabGroup([[
+                        sg.Tab('Full', full_display_column)
+                    ]],enable_events=True),
+                    
+        ],
+
+
     ]
     return sg.Window("S7 Parser", layout,finalize=True)

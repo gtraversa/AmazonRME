@@ -4,3 +4,7 @@
 *.png
 *.vscode
 *COMP*
+ESM survey.txt
+*.json
+PySimpleGUI-master
+test_files/*/*

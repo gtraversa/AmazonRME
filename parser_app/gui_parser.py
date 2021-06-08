@@ -14,13 +14,12 @@ window['-CLEAR FILES-'].set_cursor(cursor='hand2')
 # Run the Event Loop
 file_list =[]
 disp_list = []
+audit_path ={}
 keys = []
 while True:
     event, values = window.read()
-
     if event == "Exit" or event == sg.WIN_CLOSED:
         break
-   
     if event == "-FILE-":
         f = values["-FILE-"]
         disp_list.append(f.split('/')[-1].strip('.txt'))
@@ -55,14 +54,13 @@ while True:
         window["-KEY-"]('')
         window["-KEY LIST-"].update(keys)
     elif event == '-PARSE-':
-        full_display(None, None)
         for i,f in enumerate(file_list):
-            begin_audit(f,keys,disp_list[i])
-            window['-PARSED FILE SELECT-'].update(values =disp_list)
-            
+            audit_path[str(disp_list[i])] = begin_audit(f,keys,disp_list[i])
+            window['-PARSED FILE SELECT-'].update(values =disp_list)    
     elif event == '-PARSED FILE SELECT-':
-        print('pepe')
+        path = audit_path[values['-PARSED FILE SELECT-']]
+        window['-FULL OUTPUT-'].update('')
+        full_display(path)
        
-       
-
+    
 window.close()

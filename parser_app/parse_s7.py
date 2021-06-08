@@ -79,13 +79,18 @@ def generate_parameter_dict(keys):
         return parameters
 
 def begin_audit(f, keys,save_name):
-    data = audit_file(open(f,'r'),keys)
-    print(data)
+    try:
+        data = audit_file(open(f,'r'),keys)
+    except:
+        print(f'File {f} was not found')
+        return
     key_string= ''
     for key in keys:
         key_string += str(key) +'_'
     sep = '/'
     folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('_')
     os.makedirs(folder_path,exist_ok=True)
-    with open(folder_path+'/'+save_name+'_parsed.json','w') as finish:
+    file_name = folder_path+'/'+save_name+'_parsed.json'
+    with open(file_name,'w') as finish:
         finish.write(json.dumps(data, indent = 1))
+    return file_name

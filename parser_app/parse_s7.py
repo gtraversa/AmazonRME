@@ -62,7 +62,11 @@ def audit_file(f, keys):
                     if ':= L' in line:
                         load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
                         assign = data[conv_num]['load_identity'][load]
-                        data[conv_num][param] = assign.strip('"')
+                        try:
+                            data[conv_num][param] = assign.strip('"')
+                        except:
+                            data[conv_num][param] = assign
+                        load, assign = None, None
                     else:
                         data[conv_num][param] = line.split(':=')[1].strip(',').strip().strip(',')
     full_data[LAC_num] = data
@@ -81,14 +85,14 @@ def generate_parameter_dict(keys):
 def begin_audit(f, keys,save_name):
     try:
         data = audit_file(open(f,'r'),keys)
-    except:
-        print(f'File {f} was not found')
+    except Exception as e:
+        print(f'File {f} was not found or does not exist')
         return
     key_string= ''
     for key in keys:
-        key_string += str(key) +'_'
+        key_string += str(key) +'-'
     sep = '/'
-    folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('_')
+    folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('-')
     os.makedirs(folder_path,exist_ok=True)
     file_name = folder_path+'/'+save_name+'_parsed.json'
     with open(file_name,'w') as finish:

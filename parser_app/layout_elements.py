@@ -1,16 +1,17 @@
+from os import write
 from tkinter.constants import S
 import PySimpleGUI as sg
-def make_window(full_combo_values = []):
+def make_window():
     sg.theme('DarkBlack1')
     file_list_column = [
         [
             sg.Text("Select File"),
-            sg.In(size=(25, 1), enable_events=True, key="-FILE-"),
+            sg.In(size=(40, 1), enable_events=True, key="-FILE-"),
             sg.FileBrowse(file_types=(('Text Files', '*.txt'),)),
         ],
         [
             sg.Listbox(
-                values=[], enable_events=True, size=(40, 5), key="-FILE LIST-"
+                values=[], enable_events=True, size=(55, 5), key="-FILE LIST-"
             )
 
         ],
@@ -28,13 +29,13 @@ def make_window(full_combo_values = []):
     keyword_list_column = [
         [
             sg.Text('Enter keyword to filter'),
-            sg.In(size=(25, 1), enable_events=True, key="-KEY-"),
+            sg.In(size=(40, 1), enable_events=True, key="-KEY-"),
             sg.Button(button_text='Add', key="-ADD KEY-"),
 
         ],
         [
             sg.Listbox(
-                values=[], enable_events=True, size=(40, 5), key="-KEY LIST-"
+                values=[], enable_events=True, size=(58, 5), key="-KEY LIST-"
             ),
             sg.Button(
                 button_text='Parse', key='-PARSE-', size=(5, 3)
@@ -55,9 +56,10 @@ def make_window(full_combo_values = []):
             sg.Text('Select file'),
         ],
         [
-            sg.Combo(values=full_combo_values,
+            sg.Combo(values=[],
             auto_size_text = True,
             enable_events=True, 
+            disabled = True,
             key='-PARSED FILE SELECT-'
             ),
         ],
@@ -66,13 +68,98 @@ def make_window(full_combo_values = []):
         ],
     ]
 
-
-    full_display_column = [
+    selection_expandable_display = [
         [
-            sg.Output(
-               size=(85, 20), key='-FULL OUTPUT-'
+            sg.Text('Select file'),
+        ],
+        [
+            sg.Combo(values=[],
+            auto_size_text = True,
+            enable_events=True, 
+            disabled = True,
+            key='-PARSED FILE SELECT EXPANDABLE-'
+            ),
+        ],
+        [
+            sg.Button(button_text = 'Clear',key = '-CLEAR EXPANDABLE OUTPUT-')
+        ],
+    ]
+
+    selection_searchable_display = [
+        [
+            sg.Text('Select file'),
+        ],
+        [
+            sg.Combo(values=[],
+            auto_size_text = True,
+            enable_events=True, 
+            disabled = True,
+            key='-PARSED FILE SELECT SEARCHABLE-'
+            ),
+        ],
+        [
+            sg.Text('Select LAC'),
+        ],
+        [
+            sg.Combo(values=[],
+            auto_size_text = True,
+            enable_events=True, 
+            disabled = True,
+            key='-PARSED LAC SELECT SEARCHABLE-'
+            ),
+        ],
+        [
+            sg.Text('Select conveyor'),
+        ],
+        [
+            sg.Combo(values=[],
+            auto_size_text = True,
+            enable_events=True, 
+            disabled = True,
+            key='-PARSED CONVEYOR SELECT SEARCHABLE-'
+            ),
+        ],
+        [
+            sg.Button(button_text = 'Search',key = '-SEARCH SEARCHABLE OUTPUT-'),
+            sg.Checkbox('Keep previous searches', default=False, k='-MULTI SEARCH CB-'),
+        ],
+        [
+            sg.Button(button_text = 'Clear',key = '-CLEAR SEARCHABLE OUTPUT-')
+        ],
+    ]
+
+
+    full_display = [
+        [
+            sg.Multiline(
+               size=(90, 20), 
+               key='-FULL OUTPUT-',
+               disabled=True
             ),
             sg.Column(selection_full_display,vertical_alignment = 'top'),
+        ],
+    ]
+
+    expandable_display = [
+        [
+            sg.Listbox(
+               size=(90, 19), 
+               key='-EXPANDABLE OUTPUT-',
+               values=[]
+            ),
+            sg.Column(selection_expandable_display,vertical_alignment = 'top'),
+        ],
+
+    ]
+
+    searchable_display = [
+        [
+            sg.Multiline(
+               size=(90, 20), 
+               key='-SEARCHABLE OUTPUT-',
+               disabled = True
+            ),
+            sg.Column(selection_searchable_display,vertical_alignment = 'top'),
         ],
     ]
 
@@ -85,8 +172,10 @@ def make_window(full_combo_values = []):
             sg.Column(keyword_list_column) 
         ],
         [sg.TabGroup([[
-                        sg.Tab('Full', full_display_column)
-                    ]],enable_events=True),
+                        sg.Tab('Full', full_display),
+                        sg.Tab('Expandable', expandable_display),
+                        sg.Tab('Searchable', searchable_display)
+                    ]],enable_events=True,key = '-DISPLAY TAB-', size = (950,335)),
                     
         ],
 

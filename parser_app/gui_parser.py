@@ -6,6 +6,14 @@ from parse_s7 import *
 from display_file import *
 import webbrowser
 
+""" GUI for Siemens S7 FC parser
+
+    Created by Gianluca Traversa (RME Intern), Joe Rush and Jessica Lucas © 2021.
+    https://github.com/gtraversa/AmazonRME
+    gianlu.traversa@gmail.com
+    
+    Amazon EMA1, Derbishire, UK.
+"""
 
 window = layout_elements.make_window()
 window['-ADD KEY-'].set_cursor(cursor='hand2')

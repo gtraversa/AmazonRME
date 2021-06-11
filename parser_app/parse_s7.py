@@ -4,10 +4,13 @@ import os
 import json
 
 def audit_file(f, keys):
-    """Function to parse .txt file and extract desired features
+    """ Parse .txt s7 file and extract desired features
     
-    @param: f: file currently being parsed
-    @param: keys: string ID list of parameters to parse from the file (add any number) """
+        @param f: File currently being parsed
+        @type f: File
+        @param keys: ID list of parameters to parse from the file (add any number)
+        @type keys: List[Str]
+    """
     full_data = {}
     data = {}
     assign = None
@@ -74,15 +77,26 @@ def audit_file(f, keys):
 
 
 def generate_parameter_dict(keys):
-        """Function to generate dictionary storing and identifying parameters
+        """ Generate dictionary storing and identifying parameters
 
-        @param: keys: Desired parameters to extract """
+            @param keys: ID list of parameters to parse from the file (add any number)
+            @type keys: List[Str]
+        """
         parameters = {'load_identity':{},'Conveyor_model':''}
         for key in keys:
                 parameters[key]= ''
         return parameters
 
 def begin_audit(f, keys,save_name):
+    """ Basic validity check of file path and call parsing function, returns the path to the parsed .json
+
+        @param f: Path to .txt file to be parsed
+        @type f: Str
+        @param keys: ID list of parameters to parse from the file (add any number)
+        @type keys: List[Str]
+        @param save_name: Name to save the parsed .json file as
+        @type save_name: Str
+    """
     try:
         data = audit_file(open(f,'r'),keys)
     except Exception as e:

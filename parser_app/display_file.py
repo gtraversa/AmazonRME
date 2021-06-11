@@ -1,7 +1,16 @@
 import PySimpleGUI as sg
 import json
 
+"""Assistance functions to streamline main GUI program"""
+
 def full_display(path,window):
+    """ Load .json file and fully display all fields
+
+        @param path: Path to .json file
+        @type path: Str
+        @param window: GUI window 
+        @type window: Class Window
+    """
     try:
         with open(path) as jfile:
             f = json.load(jfile)
@@ -16,6 +25,13 @@ def full_display(path,window):
         window['-FULL OUTPUT-'].print(e)
 
 def load_LACs(path,window):
+    """ Load all available LACs in the parsed .json
+
+        @param path: Path to .json file
+        @type path: Str
+        @param window: GUI window 
+        @type window: Class Window
+    """
     try:
         with open(path) as jfile:
             f = json.load(jfile)
@@ -27,6 +43,15 @@ def load_LACs(path,window):
         window['-SEARCHABLE OUTPUT-'].print(e)
 
 def load_conveyors(path,LAC,window):
+    """ Load all available conveyors in the selected LAC from the parsed .json
+
+        @param path: Path to .json file
+        @type path: Str
+        @param LAC: LAC to expand conveyors
+        @type LAC: Str
+        @param window: GUI window 
+        @type window: Class Window
+    """
     try:
         with open(path) as jfile:
             f = json.load(jfile)
@@ -38,6 +63,17 @@ def load_conveyors(path,LAC,window):
         window['-SEARCHABLE OUTPUT-'].print(e)
 
 def searchable_display(path,LAC,conveyor,window,values):
+    """ Display the selected conveyor/all conveyor data in the searchable tab
+
+        @param path: Path to .json file
+        @type path: Str
+        @param LAC: LAC to expand conveyors
+        @type LAC: Str
+        @param conveyor: Conveyor to expand information
+        @type conveyor: Str
+        @param window: GUI window 
+        @type window: Class Window
+    """
     try:
         with open(path) as jfile:
             if values['-ALL CONV CB-']:
@@ -54,6 +90,19 @@ def searchable_display(path,LAC,conveyor,window,values):
 
 
 def expandable_display(path,depth,window,expanded_keys,target = [None]):
+    """ Display clickable options to explore parsed .json file, returns all keys currently expanded
+
+        @param path: Path to .json file
+        @type path: Str
+        @param depth: Depth of expansion of the option tree (Can be 0 for LAC lever or 1 for conveyor and parameters)
+        @type depth: Int
+        @param window: GUI window 
+        @type window: Class Window
+        @param expanded_keys: Keys currently expanded in the tree
+        @type expanded_keys: List[Str]
+        @param target: Target to expand on click (defaults to [None])
+        @type target: Str
+    """
     try:
         if target[0] in expanded_keys and target[0] is not None:
             expanded_keys.remove(target[0])
@@ -83,21 +132,57 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
         print(e)
    
 def clear_stuff(stuff,window):
+    """ Clear list of objects from the screen, used to reduce clutter
+
+        @param stuff: Objects to clear
+        @type stuff: List[Str]
+        @param window: GUI window 
+        @type window: Class Window
+    """
     for thing in stuff:
         window[thing].update('')
 
 def enable_stuff(stuff, window):
+    """ Enable list of objects from the screen, used to reduce clutter
+
+        @param stuff: Objects to clear
+        @type stuff: List[Str]
+        @param window: GUI window 
+        @type window: Class Window
+    """
     for thing in stuff:
         window[thing].update(disabled = False)
 
 def disable_stuff(stuff, window):
+    """ Disable list of objects from the screen, used to reduce clutter
+
+        @param stuff: Objects to clear
+        @type stuff: List[Str]
+        @param window: GUI window 
+        @type window: Class Window
+    """
     for thing in stuff:
         window[thing].update(disabled = True)
 
 def update_values_stuff(stuff,values,window):
+    """ Update list of objects from the screen to given values, used to reduce clutter
+
+        @param stuff: Objects to clear
+        @type stuff: List[Str]
+        @param values: Values to update in the objects
+        @type values: List[Str]
+        @param window: GUI window 
+        @type window: Class Window
+    """
     for thing in stuff:
         window[thing].update(values = values)
 
 def remove_duplicates(lst):
+    """ Remove duplicates from a list and returns it
+
+        @param lst: List to clean
+        @type lst: List
+
+    """
     return list(dict.fromkeys(lst))
 #IX_ResetESM QX_TrspStopped

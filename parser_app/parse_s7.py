@@ -87,7 +87,7 @@ def begin_audit(f, keys,save_name):
         data = audit_file(open(f,'r'),keys)
     except Exception as e:
         print(f'File {f} was not found or does not exist')
-        return
+        return 'Error'
     key_string= ''
     for key in keys:
         key_string += str(key) +'-'

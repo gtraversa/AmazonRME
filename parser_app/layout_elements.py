@@ -1,17 +1,19 @@
 from os import write
 from tkinter.constants import S
 import PySimpleGUI as sg
+from PySimpleGUI.PySimpleGUI import ThisRow
 def make_window():
     sg.theme('DarkBlack1')
     file_list_column = [
         [
             sg.Text("Select File"),
-            sg.In(size=(40, 1), enable_events=True, key="-FILE-"),
+            sg.In(size=(40, 1), key="-FILE-"),
             sg.FileBrowse(file_types=(('Text Files', '*.txt'),)),
+            sg.Button(button_text = 'Add', enable_events=True, key = '-ADD FILE-')
         ],
         [
             sg.Listbox(
-                values=[], enable_events=True, size=(55, 5), key="-FILE LIST-"
+                values=[], enable_events=True, size=(64, 5), key="-FILE LIST-"
             )
 
         ],
@@ -24,7 +26,6 @@ def make_window():
             )
         ],
     ]
-
 
     keyword_list_column = [
         [
@@ -51,6 +52,7 @@ def make_window():
 
         ],
     ]
+
     selection_full_display = [
         [
             sg.Text('Select file'),
@@ -81,7 +83,8 @@ def make_window():
             ),
         ],
         [
-            sg.Button(button_text = 'Clear',key = '-CLEAR EXPANDABLE OUTPUT-')
+            sg.Button(button_text = 'Clear',key = '-CLEAR EXPANDABLE OUTPUT-'),
+            sg.Button(button_text = 'Collapse', key = '-COLLAPSE EXPANDABLE OUTPUT-')
         ],
     ]
 
@@ -110,6 +113,7 @@ def make_window():
         ],
         [
             sg.Text('Select conveyor'),
+            sg.Checkbox('All', default= False, k = '-ALL CONV CB-', enable_events = True),
         ],
         [
             sg.Combo(values=[],
@@ -128,7 +132,6 @@ def make_window():
         ],
     ]
 
-
     full_display = [
         [
             sg.Multiline(
@@ -145,7 +148,8 @@ def make_window():
             sg.Listbox(
                size=(90, 19), 
                key='-EXPANDABLE OUTPUT-',
-               values=[]
+               values=[],
+               enable_events= True
             ),
             sg.Column(selection_expandable_display,vertical_alignment = 'top'),
         ],
@@ -163,22 +167,65 @@ def make_window():
         ],
     ]
 
+    parsing_input = [[
+            sg.Column(file_list_column),
+            sg.VSeperator(),
+            sg.Column(keyword_list_column),
+    ]]
+
+    parsed_input = [
+            [
+            sg.Text("Select File"),
+            sg.In(size=(110, 1), key="-JSON FILE-"),
+            sg.FileBrowse(button_text ='File',file_types=(('Text Files', '*.json'),)),
+            sg.FolderBrowse(button_text ='Folder', target = (ThisRow,-2)),
+            sg.Button(button_text = 'Add', enable_events=True, key = '-ADD PARSED-')
+            ],
+            [
+            sg.Listbox(
+                values=[], 
+                enable_events=True, 
+                size=(100, 5), 
+                key="-FILE LIST LOAD-",
+                pad = ((80,5),(0,5))
+            ), 
+            sg.Button(
+                button_text='Load', key='-LOAD-', size=(5, 3)
+            ),
+
+            ],
+            [
+                sg.Button(
+                    button_text='Remove', key="-REMOVE FILE LOAD-",pad = ((80,0),(0,0))
+                ),
+                sg.Button(
+                    button_text='Clear', key="-CLEAR FILES LOAD-"
+                )
+            ],
+    ]
 
 
     layout = [
-        [
-            sg.Column(file_list_column),
-            sg.VSeperator(),
-            sg.Column(keyword_list_column) 
+        [sg.TabGroup([[
+                        sg.Tab('Parse New',parsing_input),
+                        sg.Tab('Load', parsed_input),
+        ]])
         ],
         [sg.TabGroup([[
                         sg.Tab('Full', full_display),
                         sg.Tab('Expandable', expandable_display),
                         sg.Tab('Searchable', searchable_display)
-                    ]],enable_events=True,key = '-DISPLAY TAB-', size = (950,335)),
+                    ]],enable_events=True,key = '-DISPLAY TAB-', size = (1000,335)),
                     
         ],
-
+        [
+            sg.Text('Created by Gianluca Traversa (RME Intern), Joe Rush and Jessica Lucas © 2021.',
+            tooltip='Source Code',
+            enable_events = True,
+            font = ('Helvetica',7),
+            text_color='Gray',
+            key = '-COPYRIGHT-'),
+        ]
 
     ]
     return sg.Window("S7 Parser", layout,finalize=True)

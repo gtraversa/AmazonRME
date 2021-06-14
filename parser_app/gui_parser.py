@@ -62,6 +62,7 @@ while True:
 
         elif event == "-ADD PARSED-":
             f = values["-JSON FILE-"]
+            keys = extract_keys_load(f)
             if f.endswith('.json'):
                 identifier =f.split('/')[-1].split('parsed')[0].strip('_')
                 disp_list_load.append(identifier)
@@ -100,10 +101,15 @@ while True:
         elif event == '-CLEAR FILES LOAD-':
             file_list_load, disp_list_load = [],[]
             clear_stuff(["-JSON FILE-",'-FILE LIST LOAD-'],window)
+        
+        elif event == '-EXTRACT KEYS-':
+            keys = extract_keys_load(values['-PARSED FILE SELECT-'])
+            window['-KEYS DISPLAY-'].update('')
+            display_keys(keys,window)
 
         elif event == "-ADD KEY-":
             if values["-KEY-"].strip() != '':
-                keys.append(values["-KEY-"])
+                keys.append(values["-KEY-"].strip())
             keys = remove_duplicates(keys)
             window["-KEY-"]('')
             window["-KEY LIST-"].update(keys)
@@ -157,6 +163,16 @@ while True:
             path = audit_path[values['-PARSED FILE SELECT-']]
             window['-FULL OUTPUT-'].update('')
             full_display(path,window)
+        
+        elif event == '-ALL KW-':
+            path = audit_path[values['-PARSED FILE SELECT-']]
+            window['-FULL OUTPUT-'].update('')
+            kw_display(path, window, keys, kw_select = True)
+
+        elif event == '-ALL NO KW-':
+            path = audit_path[values['-PARSED FILE SELECT-']]
+            window['-FULL OUTPUT-'].update('')
+            kw_display(path, window, keys, kw_select = False)
 
         elif event == '-CLEAR FULL OUTPUT-':
             clear_stuff(['-FULL OUTPUT-','-PARSED FILE SELECT-'],window)

@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import json
+import copy
 
 """Assistance functions to streamline main GUI program"""
 
@@ -124,13 +125,73 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
                             if '       ->' + conv == target[0] or conv in [key.strip().strip('->') for key in expanded_keys if key is not None]:
                                 del f[lac][conv]['load_identity']
                                 for key in f[lac][conv].keys():
-                                    vals.append('                ->' + key + ' : ' +f[lac][conv][key])
+                                    vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
                                
                 update_values_stuff(['-EXPANDABLE OUTPUT-'],vals,window)
         return expanded_keys
     except Exception as e:
         print(e)
+
+def kw_display(path, window,keys,kw_select):
+    """ Load .json file and fully display with or without the selected keywords
+
+        @param path: Path to .json file
+        @type path: Str
+        @param window: GUI window 
+        @type window: Class Window
+        @param keys: keywords to be searched for in each conveyor for printing
+        @type keys: List[Str]
+        @param kw_select: True for displaying conveyors containing at least one not empty keyword, 
+                          False for displaying conveyors with at least one empty keyword
+        @type kw_select:Bool
+    """
+    key_flg = False
+    try:
+        with open(path) as jfile:
+            f = json.load(jfile)
+            for lac in copy.deepcopy(f).keys():
+                for conv in  copy.deepcopy(f)[lac]:
+                    del f[lac][conv]['load_identity']
+                    for key in keys:
+                        if f[lac][conv][key] != '' and kw_select:
+                            key_flg = True
+                            break
+                        elif f[lac][conv][key] == '' and not kw_select:
+                            key_flg = True
+                            break
+                    if not key_flg:
+                        del f[lac][conv]
+                    key_flg = False
+
+            window['-FULL OUTPUT-'].print(json.dumps(f, indent = 4).replace('"','').replace('\\',''))
+    except Exception as e:
+        window['-FULL OUTPUT-'].print(e)
+
+
+def extract_keys_load(path):
+    """ Retrieve keys from file path for displaying
+
+        @param path: Path to .json file
+        @type path: Str
+    """
+    crude_keys = path.split('/')[-1].split('[')[1].split(']')[0].split(',')
+    if str(type(crude_keys)) == "<class 'str'>":
+        keys = [str(crude_keys)]
+    else:
+        keys = [str(key) for key in crude_keys]
+    return keys
    
+def display_keys(keys,window):
+    """ Display currently stored keys in full display window
+
+        @param keys: Currently stored keys
+        @type keys: List[Str]
+        @param window: GUI window
+        @type window: Class Window
+    """
+    for key in keys:
+        window['-KEYS DISPLAY-'].print(key)
+
 def clear_stuff(stuff,window):
     """ Clear list of objects from the screen, used to reduce clutter
 
@@ -185,4 +246,6 @@ def remove_duplicates(lst):
 
     """
     return list(dict.fromkeys(lst))
+
+
 #IX_ResetESM QX_TrspStopped

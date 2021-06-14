@@ -1,7 +1,6 @@
-from os import write
-from tkinter.constants import S
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import ThisRow
+
 def make_window():
     sg.theme('DarkBlack1')
     file_list_column = [
@@ -66,8 +65,18 @@ def make_window():
             ),
         ],
         [
+            sg.Button(button_text='All with keyword',key = '-ALL KW-', enable_events = True),
+            sg.Button(button_text='All without keyword',key = '-ALL NO KW-',enable_events = True),
             sg.Button(button_text = 'Clear',key = '-CLEAR FULL OUTPUT-')
         ],
+        [
+            sg.Multiline(
+               size=(20, 5), 
+               key='-KEYS DISPLAY-',
+               disabled=True
+            ),
+            sg.Button(button_text = 'Extract keys', enable_events= True, key ='-EXTRACT KEYS-')
+        ]
     ]
 
     selection_expandable_display = [

@@ -206,7 +206,7 @@ def clear_stuff(stuff,window):
 def enable_stuff(stuff, window):
     """ Enable list of objects from the screen, used to reduce clutter
 
-        @param stuff: Objects to clear
+        @param stuff: Objects to enable
         @type stuff: List[Str]
         @param window: GUI window 
         @type window: Class Window
@@ -217,7 +217,7 @@ def enable_stuff(stuff, window):
 def disable_stuff(stuff, window):
     """ Disable list of objects from the screen, used to reduce clutter
 
-        @param stuff: Objects to clear
+        @param stuff: Objects to disable
         @type stuff: List[Str]
         @param window: GUI window 
         @type window: Class Window
@@ -228,7 +228,7 @@ def disable_stuff(stuff, window):
 def update_values_stuff(stuff,values,window):
     """ Update list of objects from the screen to given values, used to reduce clutter
 
-        @param stuff: Objects to clear
+        @param stuff: Objects to update
         @type stuff: List[Str]
         @param values: Values to update in the objects
         @type values: List[Str]
@@ -247,5 +247,16 @@ def remove_duplicates(lst):
     """
     return list(dict.fromkeys(lst))
 
+def set_cursor(stuff, cursor, window):
+    """ Set cursor for list of objects, used to reduce clutter
 
+        @param stuff: Objects to set
+        @type stuff: List[Str]
+        @param cursor: Cursor type 
+        @type cursor: Str
+        @param window: GUI window 
+        @type window: Class Window
+    """
+    for thing in stuff:
+        window[thing].set_cursor(cursor= cursor)
 #IX_ResetESM QX_TrspStopped

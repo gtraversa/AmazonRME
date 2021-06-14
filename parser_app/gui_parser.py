@@ -16,12 +16,14 @@ import webbrowser
 """
 
 window = layout_elements.make_window()
-window['-ADD KEY-'].set_cursor(cursor='hand2')
-window['-REMOVE KEY-'].set_cursor(cursor='hand2')
-window['-FILE LIST-'].set_cursor(cursor='hand2')
-window['-REMOVE FILE-'].set_cursor(cursor='hand2')
-window['-CLEAR FILES-'].set_cursor(cursor='hand2')
-window['-CLEAR FILES-'].set_cursor(cursor='hand2')
+
+set_cursor(stuff = ['-ADD FILE-','-ADD KEY-','-REMOVE KEY-','-FILE LIST-','-REMOVE FILE-','-CLEAR FILES-',
+                '-CLEAR KEYS-','-PARSED FILE SELECT-','-ALL KW-','-ALL NO KW-','-CLEAR FULL OUTPUT-','-EXTRACT KEYS-',
+                '-PARSED FILE SELECT EXPANDABLE-','-CLEAR EXPANDABLE OUTPUT-','-COLLAPSE EXPANDABLE OUTPUT-',
+                '-PARSED FILE SELECT SEARCHABLE-','-PARSED LAC SELECT SEARCHABLE-','-ALL CONV CB-','-PARSE-',
+                '-PARSED CONVEYOR SELECT SEARCHABLE-','-SEARCH SEARCHABLE OUTPUT-','-MULTI SEARCH CB-','-CLEAR SEARCHABLE OUTPUT-',
+                '-FB PARSED-','-FOB PARSED-','-FILE LIST LOAD-','-LOAD-','-REMOVE FILE LOAD-','-CLEAR FILES LOAD-','-COPYRIGHT-'],cursor='hand2', window =window)
+
 # Run the Event Loop
 file_list = []
 file_list_load = []
@@ -37,6 +39,8 @@ while True:
             break
 
         if event == "-ADD FILE-":
+            if values['-FILE-'] == '':
+                continue
             f = values["-FILE-"]
             if len(keys) <1:
                 disp_list.append(f.split('/')[-1].strip('.txt'))
@@ -110,6 +114,8 @@ while True:
         elif event == "-ADD KEY-":
             if values["-KEY-"].strip() != '':
                 keys.append(values["-KEY-"].strip())
+            else:
+                continue
             keys = remove_duplicates(keys)
             window["-KEY-"]('')
             window["-KEY LIST-"].update(keys)

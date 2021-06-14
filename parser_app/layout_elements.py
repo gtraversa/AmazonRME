@@ -186,8 +186,8 @@ def make_window():
             [
             sg.Text("Select File"),
             sg.In(size=(110, 1), key="-JSON FILE-"),
-            sg.FileBrowse(button_text ='File',file_types=(('Text Files', '*.json'),)),
-            sg.FolderBrowse(button_text ='Folder', target = (ThisRow,-2)),
+            sg.FileBrowse(button_text ='File',file_types=(('Text Files', '*.json'),),key = '-FB PARSED-'),
+            sg.FolderBrowse(button_text ='Folder', target = (ThisRow,-2),key = '-FOB PARSED-'),
             sg.Button(button_text = 'Add', enable_events=True, key = '-ADD PARSED-')
             ],
             [
@@ -216,14 +216,14 @@ def make_window():
 
     layout = [
         [sg.TabGroup([[
-                        sg.Tab('Parse New',parsing_input),
-                        sg.Tab('Load', parsed_input),
+                        sg.Tab('Parse New',parsing_input,key = '-PARSE NEW TAB-'),
+                        sg.Tab('Load', parsed_input,key = '-PARSED TAB-'),
         ]])
         ],
         [sg.TabGroup([[
-                        sg.Tab('Full', full_display),
-                        sg.Tab('Expandable', expandable_display),
-                        sg.Tab('Searchable', searchable_display)
+                        sg.Tab('Full', full_display,key = '-FULL TAB-'),
+                        sg.Tab('Expandable', expandable_display,key = '-EXPANDABLE TAB-'),
+                        sg.Tab('Searchable', searchable_display,key = '-SEARCHABLE TAB-')
                     ]],enable_events=True,key = '-DISPLAY TAB-', size = (1000,335)),
                     
         ],
@@ -237,4 +237,4 @@ def make_window():
         ]
 
     ]
-    return sg.Window("S7 Parser", layout,finalize=True)
+    return sg.Window("S7 Parser", layout,finalize=True,icon = r'C:\Users\gttraver\Desktop\Inbound ESM\parser_app\Logo\logo.ico')

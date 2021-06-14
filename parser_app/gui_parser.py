@@ -82,6 +82,7 @@ while True:
                         file_list_load.append(fpath)
                         audit_path[identifier] = fpath
             window["-FILE LIST LOAD-"].update(disp_list_load)
+            window['-JSON FILE-'].update('')
 
         elif event == '-LOAD-':
             for key,value in audit_path.items():
@@ -182,7 +183,7 @@ while True:
             kw_display(path, window, keys, kw_select = False)
 
         elif event == '-CLEAR FULL OUTPUT-':
-            clear_stuff(['-FULL OUTPUT-','-PARSED FILE SELECT-'],window)
+            clear_stuff(['-FULL OUTPUT-','-PARSED FILE SELECT-', '-KEYS DISPLAY-'],window)
 
         elif event == '-PARSED FILE SELECT SEARCHABLE-':
             path = audit_path[values['-PARSED FILE SELECT SEARCHABLE-']]

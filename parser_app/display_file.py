@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import json
 import copy
+from os.path import isdir
 
 """Assistance functions to streamline main GUI program"""
 
@@ -174,7 +175,12 @@ def extract_keys_load(path):
         @param path: Path to .json file
         @type path: Str
     """
-    crude_keys = path.split('/')[-1].split('[')[1].split(']')[0].split(',')
+    crude_keys=[]
+    if isdir(path):
+        print('DIR')
+        crude_keys = path.split('/')[-1].split('-')
+    else:
+        crude_keys = path.split('/')[-1].split('[')[1].split(']')[0].split(',')
     if str(type(crude_keys)) == "<class 'str'>":
         keys = [str(crude_keys)]
     else:

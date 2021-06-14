@@ -54,6 +54,7 @@ while True:
             disp_list = remove_duplicates(disp_list)
             file_list = remove_duplicates(file_list)
             window["-FILE LIST-"].update(disp_list+disp_list_load)
+            window['-FILE-'].update('')
 
         elif event == "-REMOVE FILE-":
             try:

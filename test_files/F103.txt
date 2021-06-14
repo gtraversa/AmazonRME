@@ -1,0 +1,1843 @@
+FUNCTION "FC_LAC001_F106IndctTrnsp" : VOID
+TITLE =LAC001 - F106IndctTrnsp
+AUTHOR : Generat
+VERSION : 0.0
+
+
+VAR_TEMP
+  dummy : BOOL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =1100 - Operating Mode F106 Induct + Transport
+
+      CALL "FB_1010_Mode" , "IDB_1100" (
+           IW_LacNo                 := 1,
+           QX_Auto                  := "IDB_1100".QX_Auto,
+           QX_Man                   := "IDB_1100".QX_Man,
+           QX_Off                   := "IDB_1100".QX_Off,
+           QX_Ack                   := "IDB_1100".QX_Ack,
+           QX_SumErrLac             := "IDB_1100".QX_SumErrLac,
+           QX_SumMsgLac             := "IDB_1100".QX_SumMsgLac,
+           QX_StartUpAuto           := "IDB_1100".QX_StartUpAuto,
+           QX_TrspStopped           := "IDB_1100".QX_TrspStopped,
+           QX_ReqOffAct             := "IDB_1100".QX_ReqOffAct,
+           QX_Msg                   := "IDB_1100".QX_Msg,
+           QX_Err                   := "IDB_1100".QX_Err);
+
+      NOP   0; 
+NETWORK
+TITLE =F103.1101 < F106.1122
+
+//dir3.in
+      L     IW  1500; 
+      T     DB2060.DBW 1442; 
+
+//dir3.out    
+
+      L     DB2060.DBW 1444; 
+      T     QW  1500; 
+NETWORK
+TITLE =1101 - Belt Conveyor Jam
+
+      A     "IDB_1101".QX_StatDrvFwd; 
+      A     "=F103+1101-B1408:4"; 
+      L     S5T#1M; 
+      SD    T   1100; 
+      A     T   1100; 
+      S     "1101_Jam"; 
+
+      A     "=F103+1101-U1400-S1402"; 
+      AN    "=F103+1101-B1408:4"; 
+      R     "1101_Jam"; 
+
+      A     "1101_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1101-A1001:-X1:3"; 
+NETWORK
+TITLE =1101 - Belt Conveyor Module 1101
+// ProductID: GF
+// Power-Bus: 1SB11
+      A     "=F103+1101-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1101".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1101-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "H_O_ReadyF106_1122"; 
+      O     "=F103+1101-B1408:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1102".QX_StatDrvFwd; 
+      A     "=F103+1101-B4033:4"; 
+      O     "1101_Jam"; 
+      O(    ; 
+      AN    "IDB_1102".QX_StatDrvFwd; 
+      A     "=F103+1101-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1101; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1101; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1101" (
+           IW_HsRear                := 1101,
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1101".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1101".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1101".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1101".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1101".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1101".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1101".QX_TORdy,
+           QX_HORdy                 := "IDB_1101".QX_HORdy,
+           QX_TrspActive            := "IDB_1101".QX_TrspActive,
+           QX_TrspFro               := "IDB_1101".QX_TrspFro,
+           QX_Msg                   := "IDB_1101".QX_Msg,
+           QX_Err                   := "IDB_1101".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1101 - SEW interface
+
+      A     "IDB_1101".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1101".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1100".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 401,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 450,
+           Iw_Cfg_MaxFreq           := 45,
+           Iw_Cfg_MaxSpeed          := 1020,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1101".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1102 - Belt Conveyor Jam
+
+      A     "IDB_1102".QX_StatDrvFwd; 
+      A     "=F103+1102-B4035:4"; 
+      L     S5T#1M; 
+      SD    T   1103; 
+      A     T   1103; 
+      S     "1102_Jam"; 
+
+      A     "=F103+1102-U4036-S4037"; 
+      AN    "=F103+1102-B4035:4"; 
+      R     "1102_Jam"; 
+
+      A     "1102_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1101-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1102 - Belt Conveyor Module 1102
+// ProductID: GF
+// Power-Bus: 1SB11
+      A     "=F103+1102-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1102".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1102-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1101-B4033:4"; 
+      O     "=F103+1101-B1408:4"; 
+      O     "=F103+1102-B4035:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1112".QX_StatDrvFwd; 
+      A     "=F103+1102-B4033:4"; 
+      O     "1102_Jam"; 
+      O(    ; 
+      AN    "IDB_1112".QX_StatDrvFwd; 
+      A     "=F103+1102-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1102; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1102; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1102" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1102".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1102".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1102".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1102".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1102".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1102".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1102".QX_TORdy,
+           QX_HORdy                 := "IDB_1102".QX_HORdy,
+           QX_TrspActive            := "IDB_1102".QX_TrspActive,
+
+
+           QX_TrspFro               := "IDB_1102".QX_TrspFro,
+           QX_Msg                   := "IDB_1102".QX_Msg,
+           QX_Err                   := "IDB_1102".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1102 - SEW interface
+
+      A     "IDB_1102".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1102".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1100".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 408,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1400,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1102".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =SAV Custom Errors/Messages
+
+// SAV LAC Errors
+// 1101 Jam
+      A     "1101_Jam"; 
+      =     "IDB_1100".Err.E01.B01_Spare; 
+// 1102 Jam
+      A     "1102_Jam"; 
+      =     "IDB_1100".Err.E01.B02_Spare; 
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Err.E01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Err.E01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Err.E01.B05_Spare
+//-------------------------------------------
+// SAV LAC Messages
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Msg.M01.B02_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Msg.M01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Msg.M01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Msg.M01.B05_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1100".Msg.M01.B06_Spare
+NETWORK
+TITLE =End
+
+
+
+END_FUNCTION
+
+FUNCTION "FC_LAC002_F105IndctTrnsp" : VOID
+TITLE =LAC002 - F105IndctTrnsp
+AUTHOR : Generat
+VERSION : 0.0
+
+
+VAR_TEMP
+  dummy : BOOL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =1110 - Operating Mode F105 Induct + Transport
+
+      CALL "FB_1010_Mode" , "IDB_1110" (
+           IW_LacNo                 := 2,
+           QX_Auto                  := "IDB_1110".QX_Auto,
+           QX_Man                   := "IDB_1110".QX_Man,
+           QX_Off                   := "IDB_1110".QX_Off,
+           QX_Ack                   := "IDB_1110".QX_Ack,
+           QX_SumErrLac             := "IDB_1110".QX_SumErrLac,
+           QX_SumMsgLac             := "IDB_1110".QX_SumMsgLac,
+           QX_StartUpAuto           := "IDB_1110".QX_StartUpAuto,
+           QX_TrspStopped           := "IDB_1110".QX_TrspStopped,
+           QX_ReqOffAct             := "IDB_1110".QX_ReqOffAct,
+           QX_Msg                   := "IDB_1110".QX_Msg,
+           QX_Err                   := "IDB_1110".QX_Err);
+
+      NOP   0; 
+NETWORK
+TITLE =F103.1111 < F105.1122
+
+//DIR3.in
+      L     IW  1502; 
+      T     DB2060.DBW 1582; 
+
+//DIR3.out
+      L     DB2060.DBW 1584; 
+      T     QW  1502; 
+
+
+NETWORK
+TITLE =1111 - Belt Conveyor Jam
+
+      A     "IDB_1111".QX_StatDrvFwd; 
+      A     "=F103+1111-B4035:4"; 
+      L     S5T#1M; 
+      SD    T   1110; 
+      A     T   1110; 
+      S     "1111_Jam"; 
+
+      A     "=F103+1111-U4034-S4037"; 
+      AN    "=F103+1111-B4035:4"; 
+      R     "1111_Jam"; 
+
+      A     "1111_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1111-Q4001:DI5/DO1"; 
+NETWORK
+TITLE =1111 - Belt Conveyor Module 1111
+// ProductID: GF
+// Power-Bus: 1SB11
+      A     "=F103+1111-B4041:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1111".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1111-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "H_O_ReadyF105_1122"; 
+      O     "=F103+1111-B4035:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1112".QX_StatDrvFwd; 
+      A     "=F103+1111-B4041:4"; 
+      O     "1111_Jam"; 
+      O(    ; 
+      AN    "IDB_1112".QX_StatDrvFwd; 
+      A     "=F103+1111-B4041:4"; 
+      L     S5T#1S; 
+      SF    T   1111; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1111; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1111" (
+           IW_HsRear                := 1111,
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1111".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1111".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1111".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1111".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1111".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1111".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1111".QX_TORdy,
+           QX_HORdy                 := "IDB_1111".QX_HORdy,
+           QX_TrspActive            := "IDB_1111".QX_TrspActive,
+           QX_TrspFro               := "IDB_1111".QX_TrspFro,
+           QX_Msg                   := "IDB_1111".QX_Msg,
+           QX_Err                   := "IDB_1111".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1111 - SEW interface
+
+      A     "IDB_1111".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1111".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1110".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 415,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 450,
+           Iw_Cfg_MaxFreq           := 45,
+           Iw_Cfg_MaxSpeed          := 1020,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1111".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1112 - Belt Conveyor Jam
+
+      A     "IDB_1112".QX_StatDrvFwd; 
+      A     "=F103+1112-B4033:4"; 
+      L     S5T#1M; 
+      SD    T   1114; 
+      A     T   1114; 
+      S     "1112_Jam"; 
+
+      A     "=F103+1112-U4036-S4037"; 
+      AN    "=F103+1112-B4033:4"; 
+      R     "1112_Jam"; 
+
+      A     "1112_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1112-Q4001:DI5/DO1"; 
+NETWORK
+TITLE =1112 - Belt Conveyor Module 1112
+// ProductID: GF
+// Power-Bus: 1SB11
+      A     "=F103+1112-B4035:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1112".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1112-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1102-B4033:4"; 
+      O     "=F103+1102-B4035:4"; 
+      O     "=F103+1111-B4041:4"; 
+      O     "=F103+1111-B4035:4"; 
+      O     "=F103+1112-B4033:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1113".QX_StatDrvFwd; 
+      A     "=F103+1112-B4035:4"; 
+      O     "1112_Jam"; 
+      O(    ; 
+      AN    "IDB_1113".QX_StatDrvFwd; 
+      A     "=F103+1112-B4035:4"; 
+      L     S5T#1S; 
+      SF    T   1112; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1112; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1112" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1112".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1112".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1112".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1112".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1112".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1112".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1112".QX_TORdy,
+
+           QX_HORdy                 := "IDB_1112".QX_HORdy,
+           QX_TrspActive            := "IDB_1112".QX_TrspActive,
+           QX_TrspFro               := "IDB_1112".QX_TrspFro,
+           QX_Msg                   := "IDB_1112".QX_Msg,
+           QX_Err                   := "IDB_1112".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1112 - SEW interface
+
+      A     "IDB_1112".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1112".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1110".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 422,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1420,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1112".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1113 - Belt Conveyor Module 1113
+// ProductID: GF
+// Power-Bus: 1SB12
+      A     "=F103+1113-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1113".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1113-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1102-B4033:4"; 
+      O     "=F103+1111-B4041:4"; 
+      O     "=F103+1111-B4035:4"; 
+      O     "=F103+1112-B4035:4"; 
+      O     "=F103+1112-B4033:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1122".QX_StatDrvFwd; 
+      A     "=F103+1113-B4033:4"; 
+      O(    ; 
+      AN    "IDB_1122".QX_StatDrvFwd; 
+      A     "=F103+1113-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1113; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1113; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1113" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1113".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1113".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1113".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1113".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1113".QX_StatDrvFwd,
+
+
+           QX_StatDrvBwd            := "IDB_1113".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1113".QX_TORdy,
+           QX_HORdy                 := "IDB_1113".QX_HORdy,
+           QX_TrspActive            := "IDB_1113".QX_TrspActive,
+           QX_TrspFro               := "IDB_1113".QX_TrspFro,
+           QX_Msg                   := "IDB_1113".QX_Msg,
+           QX_Err                   := "IDB_1113".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1113 - SEW interface
+
+      A     "IDB_1113".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1113".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1110".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 429,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1420,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1113".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =SAV Custom Errors/Messages
+
+// SAV LAC Errors
+// 1111 Jam
+      A     "1111_Jam"; 
+      =     "IDB_1110".Err.E01.B01_Spare; 
+// 1112 Jam
+      A     "1112_Jam"; 
+      =     "IDB_1110".Err.E01.B02_Spare; 
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Err.E01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Err.E01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Err.E01.B05_Spare
+//-------------------------------------------
+// SAV LAC Messages
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Msg.M01.B02_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Msg.M01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Msg.M01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Msg.M01.B05_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1110".Msg.M01.B06_Spare
+NETWORK
+TITLE =End
+
+
+
+END_FUNCTION
+
+FUNCTION "FC_LAC003_F104IndctTrnsp" : VOID
+TITLE =LAC003 - F104IndctTrnsp
+AUTHOR : Generat
+VERSION : 0.0
+
+
+VAR_TEMP
+  dummy : BOOL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =1120 - Operating Mode F104 Induct + Transport
+
+      CALL "FB_1010_Mode" , "IDB_1120" (
+           IW_LacNo                 := 3,
+           QX_Auto                  := "IDB_1120".QX_Auto,
+           QX_Man                   := "IDB_1120".QX_Man,
+           QX_Off                   := "IDB_1120".QX_Off,
+           QX_Ack                   := "IDB_1120".QX_Ack,
+           QX_SumErrLac             := "IDB_1120".QX_SumErrLac,
+           QX_SumMsgLac             := "IDB_1120".QX_SumMsgLac,
+           QX_StartUpAuto           := "IDB_1120".QX_StartUpAuto,
+           QX_TrspStopped           := "IDB_1120".QX_TrspStopped,
+           QX_ReqOffAct             := "IDB_1120".QX_ReqOffAct,
+           QX_Msg                   := "IDB_1120".QX_Msg,
+           QX_Err                   := "IDB_1120".QX_Err);
+
+      NOP   0; 
+NETWORK
+TITLE =F103.1121 < F104.1122
+
+// Receive from F104
+
+// DIR3.OUT
+      L     IW  1504; 
+      T     DB2060.DBW 1722; 
+
+// DIR3.IN
+      L     DB2060.DBW 1724; 
+      T     QW  1504; 
+
+NETWORK
+TITLE =1121 - Belt Conveyor Jam
+
+      A     "IDB_1121".QX_StatDrvFwd; 
+      A     "=F103+1121-B4037:4"; 
+      L     S5T#1M; 
+      SD    T   1120; 
+      A     T   1120; 
+      S     "1121_Jam"; 
+
+      A     "=F103+1121-U4034-S4035"; 
+      AN    "=F103+1121-B4037:4"; 
+      R     "1121_Jam"; 
+
+      A     "1121_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1121-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1121 - Belt Conveyor Module 1121
+// ProductID: GF
+// Power-Bus: 1SB12
+      A     "=F103+1121-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1121".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1121-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "H_O_ReadyF104_1122"; 
+      O     "=F103+1121-B4037:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1122".QX_StatDrvFwd; 
+      A     "=F103+1121-B4033:4"; 
+      O     "1121_Jam"; 
+      O(    ; 
+      AN    "IDB_1122".QX_StatDrvFwd; 
+      A     "=F103+1121-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1121; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1121; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1121" (
+           IW_HsRear                := 1121,
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1121".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1121".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1121".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1121".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1121".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1121".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1121".QX_TORdy,
+           QX_HORdy                 := "IDB_1121".QX_HORdy,
+           QX_TrspActive            := "IDB_1121".QX_TrspActive,
+           QX_TrspFro               := "IDB_1121".QX_TrspFro,
+           QX_Msg                   := "IDB_1121".QX_Msg,
+           QX_Err                   := "IDB_1121".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1121 - SEW interface
+
+      A     "IDB_1121".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1121".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1120".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 436,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 450,
+           Iw_Cfg_MaxFreq           := 45,
+           Iw_Cfg_MaxSpeed          := 1030,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1121".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1122 - Belt Conveyor Jam
+
+      A     "IDB_1122".QX_StatDrvFwd; 
+      A     "=F103+1122-B4033:4"; 
+      L     S5T#1M; 
+      SD    T   1125; 
+      A     T   1125; 
+      S     "1122_Jam"; 
+
+      A     "=F103+1122-U4036-S4037"; 
+      AN    "=F103+1122-B4033:4"; 
+      R     "1122_Jam"; 
+
+      A     "1122_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1122-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1122 - Belt Conveyor Module 1122
+// ProductID: GF
+// Power-Bus: 1SB12
+      A     "=F103+1122-B4035:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1122".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1122-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1112-B4035:4"; 
+      O     "=F103+1113-B4033:4"; 
+      O     "=F103+1121-B4033:4"; 
+      O     "=F103+1121-B4037:4"; 
+      O     "=F103+1122-B4033:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1123".QX_StatDrvFwd; 
+      A     "=F103+1122-B4035:4"; 
+      O     "1122_Jam"; 
+      O(    ; 
+      AN    "IDB_1123".QX_StatDrvFwd; 
+      A     "=F103+1122-B4035:4"; 
+      L     S5T#1S; 
+      SF    T   1122; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1122; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1122" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1122".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1122".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1122".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1122".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1122".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1122".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1122".QX_TORdy,
+
+           QX_HORdy                 := "IDB_1122".QX_HORdy,
+           QX_TrspActive            := "IDB_1122".QX_TrspActive,
+           QX_TrspFro               := "IDB_1122".QX_TrspFro,
+           QX_Msg                   := "IDB_1122".QX_Msg,
+           QX_Err                   := "IDB_1122".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1122 - SEW interface
+
+      A     "IDB_1122".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1122".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1120".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 443,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1400,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1122".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1123 - Belt Conveyor Module 1123
+// ProductID: GF
+// Power-Bus: 1SB12
+      A     "=F103+1123-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1123".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1123-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1113-B4033:4"; 
+      O     "=F103+1121-B4033:4"; 
+      O     "=F103+1121-B4037:4"; 
+      O     "=F103+1122-B4035:4"; 
+      O     "=F103+1122-B4033:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1124".QX_StatDrvFwd; 
+      A     "=F103+1123-B4033:4"; 
+      O(    ; 
+      AN    "IDB_1124".QX_StatDrvFwd; 
+      A     "=F103+1123-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1123; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1123; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1123" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1123".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1123".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1123".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1123".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1123".QX_StatDrvFwd,
+
+           QX_StatDrvBwd            := "IDB_1123".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1123".QX_TORdy,
+           QX_HORdy                 := "IDB_1123".QX_HORdy,
+           QX_TrspActive            := "IDB_1123".QX_TrspActive,
+           QX_TrspFro               := "IDB_1123".QX_TrspFro,
+           QX_Msg                   := "IDB_1123".QX_Msg,
+           QX_Err                   := "IDB_1123".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1123 - SEW interface
+
+      A     "IDB_1123".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1123".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1120".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 450,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1400,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1123".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1124 - Belt Conveyor Module 1124
+// ProductID: GF
+// Power-Bus: 1SB12
+      A     "=F103+1124-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1124".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1124-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1113-B4033:4"; 
+      O     "=F103+1122-B4035:4"; 
+      O     "=F103+1123-B4033:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1131".QX_StatDrvFwd; 
+      A     "=F103+1124-B4033:4"; 
+      O(    ; 
+      AN    "IDB_1131".QX_StatDrvFwd; 
+      A     "=F103+1124-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1124; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1124; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1124" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1124".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1124".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1124".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1124".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1124".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1124".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1124".QX_TORdy,
+
+
+           QX_HORdy                 := "IDB_1124".QX_HORdy,
+           QX_TrspActive            := "IDB_1124".QX_TrspActive,
+           QX_TrspFro               := "IDB_1124".QX_TrspFro,
+           QX_Msg                   := "IDB_1124".QX_Msg,
+           QX_Err                   := "IDB_1124".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1124 - SEW interface
+
+      A     "IDB_1124".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1124".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1120".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 457,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 700,
+           Iw_Cfg_MaxFreq           := 51,
+           Iw_Cfg_MaxSpeed          := 1400,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1124".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =SAV Custom Errors/Messages
+
+// SAV LAC Errors
+// 1121 Jam
+      A     "1121_Jam"; 
+      =     "IDB_1120".Err.E01.B01_Spare; 
+// 1122 Jam
+      A     "1122_Jam"; 
+      =     "IDB_1120".Err.E01.B02_Spare; 
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Err.E01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Err.E01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Err.E01.B05_Spare
+//-------------------------------------------
+// SAV LAC Messages
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Msg.M01.B02_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Msg.M01.B03_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Msg.M01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Msg.M01.B05_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1120".Msg.M01.B06_Spare
+NETWORK
+TITLE =End
+
+
+
+END_FUNCTION
+
+FUNCTION "FC_LAC004_FeedtoBalers" : VOID
+TITLE =LAC004 - FeedtoBalers
+AUTHOR : Generat
+VERSION : 0.0
+
+
+VAR_TEMP
+  dummy : BOOL ;	
+END_VAR
+BEGIN
+NETWORK
+TITLE =1130 - Operating Mode Feed to Balers
+
+      CALL "FB_1010_Mode" , "IDB_1130" (
+           IW_LacNo                 := 4,
+           QX_Auto                  := "IDB_1130".QX_Auto,
+           QX_Man                   := "IDB_1130".QX_Man,
+           QX_Off                   := "IDB_1130".QX_Off,
+           QX_Ack                   := "IDB_1130".QX_Ack,
+           QX_SumErrLac             := "IDB_1130".QX_SumErrLac,
+           QX_SumMsgLac             := "IDB_1130".QX_SumMsgLac,
+           QX_StartUpAuto           := "IDB_1130".QX_StartUpAuto,
+           QX_TrspStopped           := "IDB_1130".QX_TrspStopped,
+           QX_ReqOffAct             := "IDB_1130".QX_ReqOffAct,
+           QX_Msg                   := "IDB_1130".QX_Msg,
+           QX_Err                   := "IDB_1130".QX_Err);
+
+      NOP   0; 
+NETWORK
+TITLE =1131 - Belt Conveyor Jam
+
+      A     "IDB_1131".QX_StatDrvFwd; 
+      A     "=F103+1131-B4035:4"; 
+      L     S5T#15S; 
+      SD    T   1130; 
+      A     T   1130; 
+      S     "1131_Jam"; 
+
+      A     "=F103+1131-U4036-S4037"; 
+      AN    "=F103+1131-B4035:4"; 
+      R     "1131_Jam"; 
+
+      A     "1131_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1124-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1131 - Belt Conveyor Module 1131
+// ProductID: GF
+// Power-Bus: 1SB13
+      A     "=F103+1131-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1131".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1131-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1123-B4033:4"; 
+      O     "=F103+1124-B4033:4"; 
+      O     "=F103+1131-B4035:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1132".QX_StatDrvFwd; 
+      A     "=F103+1131-B4033:4"; 
+      O     "1131_Jam"; 
+      O(    ; 
+      AN    "IDB_1132".QX_StatDrvFwd; 
+      A     "=F103+1131-B4033:4"; 
+      L     S5T#1S; 
+      SF    T   1131; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1131; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1131" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1131".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1131".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1131".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1131".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1131".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1131".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1131".QX_TORdy,
+           QX_HORdy                 := "IDB_1131".QX_HORdy,
+           QX_TrspActive            := "IDB_1131".QX_TrspActive,
+
+           QX_TrspFro               := "IDB_1131".QX_TrspFro,
+           QX_Msg                   := "IDB_1131".QX_Msg,
+           QX_Err                   := "IDB_1131".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1131 - SEW interface
+
+      A     "IDB_1131".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1131".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1130".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 464,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 800,
+           Iw_Cfg_MaxFreq           := 58,
+           Iw_Cfg_MaxSpeed          := 1400,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1131".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1132 - Belt Conveyor Jam
+
+      A     "IDB_1132".QX_StatDrvFwd; 
+      A     "=F103+1132-B4035.1:4"; 
+      L     S5T#15S; 
+      SD    T   1136; 
+      A     T   1136; 
+      S     "1132_Jam"; 
+
+      A     "=F103+1132-U4036-S4037"; 
+      AN    "=F103+1132-B4035.1:4"; 
+      R     "1132_Jam"; 
+
+      A     "1132_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1131-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1132 - Belt Conveyor Module 1132
+// ProductID: GF
+// Power-Bus: 1SB13
+      A     "=F103+1132-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1132".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1132-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1131-B4033:4"; 
+      O     "=F103+1131-B4035:4"; 
+      O     "=F103+1132-B4035.1:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "IDB_1133".QX_StatDrvFwd; 
+      A     "=F103+1132-B4033:4"; 
+      O     "1132_Jam"; 
+      O(    ; 
+      AN    "IDB_1133".QX_StatDrvFwd; 
+      A     "=F103+1132-B4033:4"; 
+      L     S5T#5S; 
+      SF    T   1132; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1132; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1132" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1132".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1132".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1132".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1132".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1132".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1132".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1132".QX_TORdy,
+           QX_HORdy                 := "IDB_1132".QX_HORdy,
+           QX_TrspActive            := "IDB_1132".QX_TrspActive,
+
+           QX_TrspFro               := "IDB_1132".QX_TrspFro,
+           QX_Msg                   := "IDB_1132".QX_Msg,
+           QX_Err                   := "IDB_1132".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1132 - SEW interface
+
+      A     "IDB_1132".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1132".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1130".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 471,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 900,
+           Iw_Cfg_MaxFreq           := 50,
+           Iw_Cfg_MaxSpeed          := 1850,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1132".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1133 - Belt Conveyor Jam
+
+      A(    ; 
+      O     "IDB_1133".QX_StatDrvFwd; 
+      O     "IDB_1133".QX_StatDrvBwd; 
+      )     ; 
+      A     "=F103+1133-B4035.2:4"; 
+
+      L     S5T#15S; 
+      SD    T   1137; 
+      A     T   1137; 
+      S     "1133_Jam"; 
+
+      A     "=F103+1133-U1400-S1402"; 
+      AN    "=F103+1133-B4035.2:4"; 
+      R     "1133_Jam"; 
+
+      A     "1133_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1133-Q4001:DI4/DO0"; 
+
+
+
+///     A(    
+///     O     "=F103+1134-U4036-S4037"
+///     O     "=F103+1135-U4036-S4037"
+///     )     
+///     AN    "=F103+1133-B4035.2:4"
+///     R     "1133_Jam"
+NETWORK
+TITLE =1133 - Belt Conveyor Module 1133
+// ProductID: GF
+// Power-Bus: 1SB13
+      A     "State_0"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1133".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1133-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1131-B4033:4"; 
+      O     "=F103+1132-B4033:4"; 
+      O     "=F103+1132-B4035.1:4"; 
+      O     "=F103+1133-B4035.2:4"; 
+      O     "=F103+1133-B4033:4"; 
+      O     "=F103+1133-B4035:4"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      AN    "BALER1_Run"; 
+      AN    "BALER2_Run"; 
+      O     "1133_Jam"; 
+      O(    ; 
+      A(    ; 
+      A     "BALER1_Run"; 
+      AN    "IDB_1135".QX_StatDrvFwd; 
+      O     ; 
+      A     "BALER2_Run"; 
+      AN    "IDB_1134".QX_StatDrvFwd; 
+      )     ; 
+
+      L     S5T#2S; 
+      SF    T   1133; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1133; 
+      )     ; 
+      O(    ; 
+      AN    "BALER1_Run"; 
+      L     S5T#3S; 
+      SE    T   1143; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1143; 
+      )     ; 
+      O(    ; 
+      AN    "BALER2_Run"; 
+      L     S5T#3S; 
+      SE    T   1144; 
+      NOP   0; 
+      NOP   0; 
+      NOP   0; 
+      A     T   1144; 
+      )     ; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1133" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1133".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1133".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1133".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1133".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1133".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1133".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1133".QX_TORdy,
+           QX_HORdy                 := "IDB_1133".QX_HORdy,
+           QX_TrspActive            := "IDB_1133".QX_TrspActive,
+           QX_TrspFro               := "IDB_1133".QX_TrspFro,
+           QX_Msg                   := "IDB_1133".QX_Msg,
+           QX_Err                   := "IDB_1133".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1133 - SEW interface
+//BALER2 - 1134 = 1133 FWD
+//BALER1 - 1135 = 1133 REV
+      A(    ; 
+      A     "IDB_1133".QX_StatDrvFwd; 
+      A     "BALER2_Run"; 
+      O     ; 
+      A     "IDB_1130".QX_Man; 
+      A     "IDB_1133".qx_DrvCtl1; 
+      )     ; 
+      =     L      1.0; 
+      BLD   103; 
+      A(    ; 
+      A     "IDB_1133".QX_StatDrvFwd; 
+      A     "BALER1_Run"; 
+      O     ; 
+      A     "IDB_1130".QX_Man; 
+      A     "IDB_1133".qx_DrvCtl2; 
+      )     ; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1130".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 478,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 1000,
+           Iw_Cfg_MaxFreq           := 56,
+           Iw_Cfg_MaxSpeed          := 1860,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1133".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1134 - Belt Conveyor Jam
+
+      A     "IDB_1134".QX_StatDrvFwd; 
+      A     "=F103+1134-B4035:4"; 
+      L     S5T#15S; 
+      SD    T   1138; 
+      A     T   1138; 
+      S     "1134_Jam"; 
+
+      A     "=F103+1134-U4036-S4037"; 
+      AN    "=F103+1134-B4035:4"; 
+      R     "1134_Jam"; 
+
+      A     "1134_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1134-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1134 - Belt Conveyor Module 1134
+// ProductID: GF
+// Power-Bus: 1SB14
+      A     "=F103+1134-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1134".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1134-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1132-B4033:4"; 
+      O     "=F103+1132-B4035.1:4"; 
+      O     "=F103+1133-B4035:4"; 
+      O     "=F103+1134-B4035:4"; 
+      O     "State_1"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      ON    "BALER2_Ready"; 
+      O     "1134_Jam"; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1134" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1134".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1134".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1134".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1134".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1134".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1134".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1134".QX_TORdy,
+           QX_HORdy                 := "IDB_1134".QX_HORdy,
+           QX_TrspActive            := "IDB_1134".QX_TrspActive,
+           QX_TrspFro               := "IDB_1134".QX_TrspFro,
+           QX_Msg                   := "IDB_1134".QX_Msg,
+           QX_Err                   := "IDB_1134".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1134 - SEW interface
+
+      A     "IDB_1134".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1134".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1130".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 485,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 1000,
+           Iw_Cfg_MaxFreq           := 56,
+           Iw_Cfg_MaxSpeed          := 1850,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1134".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =1135 - Belt Conveyor Jam
+
+      A     "IDB_1135".QX_StatDrvFwd; 
+      A     "=F103+1135-B4035:4"; 
+      L     S5T#15S; 
+      SD    T   1139; 
+      A     T   1139; 
+      S     "1135_Jam"; 
+
+      A     "=F103+1135-U4036-S4037"; 
+      AN    "=F103+1135-B4035:4"; 
+      R     "1135_Jam"; 
+
+      A     "1135_Jam"; 
+      A     "Clock_1Hz"; 
+      =     "=F103+1135-Q4001:DI4/DO0"; 
+NETWORK
+TITLE =1135 - Belt Conveyor Module 1135
+// ProductID: GF
+// Power-Bus: 1SB14
+      A     "=F103+1135-B4033:4"; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1135".ix_DrvRdy; 
+      =     L      1.3; 
+      BLD   103; 
+      A     "=F103+1135-U4000-Q1:14"; 
+      =     L      1.4; 
+      BLD   103; 
+      A(    ; 
+      O     "=F103+1132-B4033:4"; 
+      O     "=F103+1132-B4035.1:4"; 
+      O     "=F103+1133-B4033:4"; 
+      O     "=F103+1135-B4035:4"; 
+      O     "State_1"; 
+      )     ; 
+      =     L      2.1; 
+      BLD   103; 
+      A(    ; 
+      ON    "BALER1_Ready"; 
+      O     "1135_Jam"; 
+      )     ; 
+      =     L      2.4; 
+      BLD   103; 
+      CALL "FB_1400_ConvMulti" , "IDB_1135" (
+           IW_HsFro                 := 1,
+           ix_StpFr                 := L      1.0,
+           ix_DrvRdy                := L      1.3,
+           ix_MtSw                  := L      1.4,
+           IX_ResetESM              := L      2.1,
+           IX_Lock                  := L      2.4,
+           qx_DrvCtl1               := "IDB_1135".qx_DrvCtl1,
+           qx_DrvCtl2               := "IDB_1135".qx_DrvCtl2,
+           qx_DrvCtl3               := "IDB_1135".qx_DrvCtl3,
+           qx_DrvCtl4               := "IDB_1135".qx_DrvCtl4,
+           QX_StatDrvFwd            := "IDB_1135".QX_StatDrvFwd,
+           QX_StatDrvBwd            := "IDB_1135".QX_StatDrvBwd,
+           QX_TORdy                 := "IDB_1135".QX_TORdy,
+           QX_HORdy                 := "IDB_1135".QX_HORdy,
+           QX_TrspActive            := "IDB_1135".QX_TrspActive,
+           QX_TrspFro               := "IDB_1135".QX_TrspFro,
+           QX_Msg                   := "IDB_1135".QX_Msg,
+           QX_Err                   := "IDB_1135".QX_Err);
+      NOP   0; 
+NETWORK
+TITLE =1135 - SEW interface
+
+      A     "IDB_1135".qx_DrvCtl1; 
+      =     L      1.0; 
+      BLD   103; 
+      A     "IDB_1135".qx_DrvCtl2; 
+      =     L      1.1; 
+      BLD   103; 
+      A     "State_1"; 
+      =     L      1.2; 
+      BLD   103; 
+      A     "IDB_1130".QX_Ack; 
+      =     L      1.3; 
+      BLD   103; 
+      CALL "Func_SEWInterface" (
+           Iw_Addr                  := 492,
+           Ix_Fwd                   := L      1.0,
+           Ix_Bwd                   := L      1.1,
+           Ix_Quick_Stop            := L      1.2,
+           Ix_Reset                 := L      1.3,
+           Iw_Speed_mmPerSecPositiv := 1000,
+           Iw_Cfg_MaxFreq           := 56,
+           Iw_Cfg_MaxSpeed          := 1850,
+           Iw_Ramp_mmPerS2          := 500,
+           Qx_Rdy                   := "IDB_1135".ix_DrvRdy,
+           Qx_Err                   := #dummy);
+      NOP   0; 
+NETWORK
+TITLE =BALER Ready
+
+      A     "State_0"; 
+      =     L      1.0; 
+      A     L      1.0; 
+      AN    "BALER2_Run"; 
+      A(    ; 
+      A     "BALER1_Ready"; 
+      A     "BALER2_Ready"; 
+      O     ; 
+      A     "BALER1_Ready"; 
+      AN    "BALER2_Ready"; 
+      )     ; 
+      AN    "IDB_1135".QX_Err; 
+      AN    "1135_Jam"; 
+      S     "BALER1_Run"; 
+      A     L      1.0; 
+      AN    "BALER1_Run"; 
+      AN    "BALER1_Ready"; 
+      A     "BALER2_Ready"; 
+      AN    "IDB_1134".QX_Err; 
+      AN    "1134_Jam"; 
+      S     "BALER2_Run"; 
+      A     L      1.0; 
+      A(    ; 
+      ON    "BALER1_Ready"; 
+      O     "IDB_1135".QX_Err; 
+      O     "1135_Jam"; 
+      )     ; 
+      R     "BALER1_Run"; 
+      A     L      1.0; 
+      A(    ; 
+      ON    "BALER2_Ready"; 
+      O     "IDB_1134".QX_Err; 
+      O     "1134_Jam"; 
+      )     ; 
+      R     "BALER2_Run"; 
+NETWORK
+TITLE =Baler 1 Route Healthy
+
+      A     "State_1"; 
+      =     L      1.0; 
+      A     L      1.0; 
+      A     "BALER1_Ready"; 
+      AN    "IDB_1135".QX_Err; 
+      AN    "1135_Jam"; 
+      =     "B1 Route Healthy"; 
+      A     L      1.0; 
+      A     "BALER2_Ready"; 
+      AN    "IDB_1134".QX_Err; 
+      AN    "1134_Jam"; 
+      =     "B2 Route Healthy"; 
+NETWORK
+TITLE =Baler Run Logic
+
+      A     "State_1"; 
+      =     L      1.0; 
+      A     L      1.0; 
+      A     "B1 Route Healthy"; 
+      A(    ; 
+      AN    "B2 Route Healthy"; 
+      AN    "BALER2_Run"; 
+      ON    "BALER2_Run"; 
+      )     ; 
+      S     "BALER1_Run"; 
+      A     L      1.0; 
+      AN    "B1 Route Healthy"; 
+      R     "BALER1_Run"; 
+      A     L      1.0; 
+      A     "B2 Route Healthy"; 
+      A(    ; 
+      ON    "B1 Route Healthy"; 
+      ON    "BALER1_Run"; 
+      )     ; 
+      S     "BALER2_Run"; 
+      A     L      1.0; 
+      AN    "B2 Route Healthy"; 
+      R     "BALER2_Run"; 
+NETWORK
+TITLE =SAV Custom Errors/Messages
+
+// SAV LAC Errors
+// 1131 Jam
+      A     "1131_Jam"; 
+      =     "IDB_1130".Err.E01.B01_Spare; 
+// 1132 Jam
+      A     "1132_Jam"; 
+      =     "IDB_1130".Err.E01.B02_Spare; 
+// 1133 Jam
+      A     "1133_Jam"; 
+      =     "IDB_1130".Err.E01.B03_Spare; 
+// 1134 Jam
+      A     "1134_Jam"; 
+      =     "IDB_1130".Err.E01.B04_Spare; 
+// 1135 Jam
+      A     "1135_Jam"; 
+      =     "IDB_1130".Err.E01.B05_Spare; 
+// BALAR1 and BALER2 not Ready
+      AN    "BALER1_Ready"; 
+      AN    "BALER2_Ready"; 
+      L     S5T#3S; 
+      SD    T   1140; 
+      A     T   1140; 
+      =     "IDB_1130".Err.E01.B06_Spare; 
+//-------------------------------------------
+// SAV LAC Messages
+// BALER1 not Ready
+      AN    "BALER1_Ready"; 
+      L     S5T#3S; 
+      SD    T   1141; 
+      A     T   1141; 
+      =     "IDB_1130".Msg.M01.B02_Spare; 
+// BALER2 not Ready
+      AN    "BALER2_Ready"; 
+      L     S5T#3S; 
+      SD    T   1142; 
+      A     T   1142; 
+      =     "IDB_1130".Msg.M01.B03_Spare; 
+// XXX
+//      A     XXX
+//      =     "IDB_1130".Msg.M01.B04_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1130".Msg.M01.B05_Spare
+// XXX
+//      A     XXX
+//      =     "IDB_1130".Msg.M01.B06_Spare
+NETWORK
+TITLE =End
+
+
+
+END_FUNCTION
+

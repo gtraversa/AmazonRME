@@ -154,9 +154,12 @@ while True:
             clear_stuff(["-KEY-",'-KEY LIST-'],window)
 
         elif event == '-PARSE-':
+            exact = False
+            if values['-EXACT CB-']:
+                exact = True
             if len(keys)>0:
                 for i,f in enumerate(file_list):
-                    audit_path[str(disp_list[i])] = begin_audit(f,keys,disp_list[i])
+                    audit_path[str(disp_list[i])] = begin_audit(f,keys,disp_list[i],exact)
                 for key,value in audit_path.items():
                     if value == 'Error':
                         del audit_path[key]

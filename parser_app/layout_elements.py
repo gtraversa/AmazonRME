@@ -48,7 +48,7 @@ def make_window():
             sg.Button(
                 button_text='Clear', key="-CLEAR KEYS-"
             ),
-
+            sg.Checkbox('Exact', key ='-EXACT CB-', default = False),
         ],
     ]
 

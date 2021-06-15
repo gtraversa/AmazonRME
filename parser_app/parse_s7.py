@@ -3,7 +3,7 @@ import copy
 import os
 import json
 
-def audit_file(f, keys):
+def audit_file(f, keys, exact):
     """ Parse .txt s7 file and extract desired features
     
         @param f: File currently being parsed
@@ -61,17 +61,34 @@ def audit_file(f, keys):
                 data[conv_num]['Conveyor_model'] = line.split('_')[0].split('"')[1]+line.split('_')[1]
 
             for param in parameters.keys():
-                if ' ' + param +' ' in line:
-                    if ':= L' in line:
-                        load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
-                        assign = data[conv_num]['load_identity'][load]
-                        try:
-                            data[conv_num][param] = assign.strip('"')
-                        except:
-                            data[conv_num][param] = assign
-                        load, assign = None, None
-                    else:
-                        data[conv_num][param] = line.split(':=')[1].strip(',').strip().strip(',')
+                search_word = ''
+                if exact:
+                    search_word = ' ' + param + ' '
+                    if search_word in line:
+                        if ':= L' in line:
+                            load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
+                            assign = data[conv_num]['load_identity'][load]
+                            try:
+                                data[conv_num][param] = assign.strip('"')
+                            except:
+                                data[conv_num][param] = assign
+                            load, assign = None, None
+                        else:
+                            data[conv_num][param] = line.split(':=')[1].strip(',').strip().strip(',')
+                else:
+                    search_word = param
+                    if search_word in line:
+                        if ':= L' in line:
+                            load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
+                            assign = data[conv_num]['load_identity'][load]
+                            parameter = line.split(':=')[0].strip()
+                            try:
+                                data[conv_num][parameter] = assign.strip('"')
+                            except:
+                                data[conv_num][parameter] = assign
+                            load, assign = None, None
+                        else:
+                            data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
     full_data[LAC_num] = data
     return full_data
 
@@ -87,7 +104,7 @@ def generate_parameter_dict(keys):
                 parameters[key]= ''
         return parameters
 
-def begin_audit(f, keys,save_name):
+def begin_audit(f, keys,save_name,exact):
     """ Basic validity check of file path and call parsing function, returns the path to the parsed .json
 
         @param f: Path to .txt file to be parsed
@@ -96,19 +113,26 @@ def begin_audit(f, keys,save_name):
         @type keys: List[Str]
         @param save_name: Name to save the parsed .json file as
         @type save_name: Str
+        @param exact: True if the exact keyword is to be searched, False if a line containing the word is to be searched
+        @type exact: Bool
     """
     try:
-        data = audit_file(open(f,'r'),keys)
+        data = audit_file(open(f,'r'),keys, exact)
     except Exception as e:
         print(f'File {f} was not found or does not exist')
         return 'Error'
     key_string= ''
+    file_name = ''
     for key in keys:
         key_string += str(key) +'-'
     sep = '/'
-    folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('-')
+    if exact:
+        folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('-')+'_Exact'
+        file_name = folder_path+'/'+save_name+'_exact_parsed.json'
+    else:
+        folder_path =  sep.join(f.split('/')[:-1]).strip("[']")+'/'+str(key_string).strip('-')
+        file_name = folder_path+'/'+save_name+'_parsed.json'
     os.makedirs(folder_path,exist_ok=True)
-    file_name = folder_path+'/'+save_name+'_parsed.json'
     with open(file_name,'w') as finish:
         finish.write(json.dumps(data, indent = 1))
     return file_name

@@ -10,3 +10,4 @@ PySimpleGUI-master
 test_files/*/*
 parser_app/build
 *.spec
+test.py

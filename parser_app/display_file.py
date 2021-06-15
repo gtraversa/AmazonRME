@@ -133,15 +133,13 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
     except Exception as e:
         print(e)
 
-def kw_display(path, window,keys,kw_select):
+def kw_display(path, window,kw_select):
     """ Load .json file and fully display with or without the selected keywords
 
         @param path: Path to .json file
         @type path: Str
         @param window: GUI window 
         @type window: Class Window
-        @param keys: keywords to be searched for in each conveyor for printing
-        @type keys: List[Str]
         @param kw_select: True for displaying conveyors containing at least one not empty keyword, 
                           False for displaying conveyors with all empty keywords
         @type kw_select:Bool

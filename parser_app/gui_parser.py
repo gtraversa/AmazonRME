@@ -178,12 +178,12 @@ while True:
         elif event == '-ALL KW-':
             path = audit_path[values['-PARSED FILE SELECT-']]
             window['-FULL OUTPUT-'].update('')
-            kw_display(path, window, keys, kw_select = True)
+            kw_display(path, window, kw_select = True)
 
         elif event == '-ALL NO KW-':
             path = audit_path[values['-PARSED FILE SELECT-']]
             window['-FULL OUTPUT-'].update('')
-            kw_display(path, window, keys, kw_select = False)
+            kw_display(path, window, kw_select = False)
 
         elif event == '-CLEAR FULL OUTPUT-':
             clear_stuff(['-FULL OUTPUT-','-PARSED FILE SELECT-', '-KEYS DISPLAY-'],window)

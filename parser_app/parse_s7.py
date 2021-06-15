@@ -21,7 +21,8 @@ def audit_file(f, keys, exact):
     conv_num = None
     LAC_num = None
     parameters = generate_parameter_dict(keys)
-    for line in f:
+
+    for line in f:#
         if 'TITLE' in line:
             if 'LAC' in line:
                 data = {}
@@ -78,10 +79,10 @@ def audit_file(f, keys, exact):
                 else:
                     search_word = param
                     if search_word in line:
+                        parameter = line.split(':=')[0].strip()
                         if ':= L' in line:
                             load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
                             assign = data[conv_num]['load_identity'][load]
-                            parameter = line.split(':=')[0].strip()
                             try:
                                 data[conv_num][parameter] = assign.strip('"')
                             except:

@@ -266,4 +266,4 @@ def set_cursor(stuff, cursor, window):
     """
     for thing in stuff:
         window[thing].set_cursor(cursor= cursor)
-#IX_ResetESM QX_TrspStopped
+#IX_ResetESM QX_TrspStopped QX_TORdy

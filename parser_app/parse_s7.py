@@ -2,6 +2,7 @@ import copy
 
 import os
 import json
+from exception_print import *
 
 def audit_file(f, keys, exact):
     """ Parse .txt s7 file and extract desired features
@@ -59,7 +60,6 @@ def audit_file(f, keys, exact):
 
             if 'CALL' in line:
                 data[conv_num]['Conveyor_model'] = line.split('_')[0].split('"')[1]+line.split('_')[1]
-
             for param in parameters.keys():
                 search_word = ''
                 if exact:
@@ -88,7 +88,10 @@ def audit_file(f, keys, exact):
                                 data[conv_num][parameter] = assign
                             load, assign = None, None
                         else:
-                            data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
+                            try:
+                                data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
+                            except:
+                                 data[conv_num][parameter] = '?'
     full_data[LAC_num] = data
     return full_data
 
@@ -119,7 +122,7 @@ def begin_audit(f, keys,save_name,exact):
     try:
         data = audit_file(open(f,'r'),keys, exact)
     except Exception as e:
-        print(f'File {f} was not found or does not exist')
+        PrintException()
         return 'Error'
     key_string= ''
     file_name = ''

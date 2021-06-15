@@ -143,7 +143,7 @@ def kw_display(path, window,keys,kw_select):
         @param keys: keywords to be searched for in each conveyor for printing
         @type keys: List[Str]
         @param kw_select: True for displaying conveyors containing at least one not empty keyword, 
-                          False for displaying conveyors with at least one empty keyword
+                          False for displaying conveyors with all empty keywords
         @type kw_select:Bool
     """
     key_flg = False
@@ -153,13 +153,17 @@ def kw_display(path, window,keys,kw_select):
             for lac in copy.deepcopy(f).keys():
                 for conv in  copy.deepcopy(f)[lac]:
                     del f[lac][conv]['load_identity']
-                    for key in keys:
-                        if f[lac][conv][key] != '' and kw_select:
-                            key_flg = True
+                    copy_for_keys = copy.deepcopy(f)
+                    del copy_for_keys[lac][conv]['Conveyor_model']
+                    for key in copy_for_keys[lac][conv].keys():
+                        if f[lac][conv][key] != '':
+                            if kw_select:
+                                key_flg = True
+                            else:
+                                key_flg = False
                             break
                         elif f[lac][conv][key] == '' and not kw_select:
                             key_flg = True
-                            break
                     if not key_flg:
                         del f[lac][conv]
                     key_flg = False

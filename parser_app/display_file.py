@@ -177,7 +177,6 @@ def extract_keys_load(path):
     """
     crude_keys=[]
     if isdir(path):
-        print('DIR')
         crude_keys = path.split('/')[-1].split('-')
     else:
         crude_keys = path.split('/')[-1].split('[')[1].split(']')[0].split(',')

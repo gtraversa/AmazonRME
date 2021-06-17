@@ -129,7 +129,7 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
                                     vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
                                
                 update_values_stuff(['-EXPANDABLE OUTPUT-'],vals,window)
-        return expanded_keys
+        return expanded_keys #TODO add side scrolling for expandavble output
     except Exception as e:
         print(e)
 
@@ -187,7 +187,7 @@ def extract_keys_load(path):
     else:
         keys = [str(key) for key in crude_keys]
     return keys
-   
+
 def display_keys(keys,window):
     """ Display currently stored keys in full display window
 

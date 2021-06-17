@@ -42,15 +42,31 @@ while True:
             if values['-FILE-'] == '':
                 continue
             f = values["-FILE-"]
-            if len(keys) <1:
-                disp_list.append(f.split('/')[-1].strip('.txt'))
+            print(f)
+            if isdir(f):
+                for fname in os.listdir(f):
+                    if fname.endswith('.txt'):
+                        if len(keys) <1:
+                            disp_list.append(fname.strip('.txt'))
+                        else:
+                            fname_disp = fname.strip('.txt')
+                            fname_disp+= '['
+                            for key in keys:
+                                fname_disp+= str(key)+','
+                            disp_list.append(fname_disp.strip(',')+ ']')
+                        fpath = f+'/'+ fname
+                        file_list.append(fpath)
+                        print(file_list)
             else:
-                fname = f.split('/')[-1].strip('.txt')
-                fname+= '['
-                for key in keys:
-                    fname+= str(key)+','
-                disp_list.append(fname.strip(',')+ ']')
-            file_list.append(f)
+                if len(keys) <1:
+                    disp_list.append(f.split('/')[-1].strip('.txt'))
+                else:
+                    fname = f.split('/')[-1].strip('.txt')
+                    fname+= '['
+                    for key in keys:
+                        fname+= str(key)+','
+                    disp_list.append(fname.strip(',')+ ']')
+                file_list.append(f)
             disp_list = remove_duplicates(disp_list)
             file_list = remove_duplicates(file_list)
             window["-FILE LIST-"].update(disp_list+disp_list_load)

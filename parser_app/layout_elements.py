@@ -1,13 +1,15 @@
 import PySimpleGUI as sg
-from PySimpleGUI.PySimpleGUI import ThisRow
+from PySimpleGUI.PySimpleGUI import FolderBrowse, ThisRow
 
 def make_window():
+    """Make window with set elements, returns window object"""
     sg.theme('DarkBlack1')
     file_list_column = [
         [
             sg.Text("Select File"),
-            sg.In(size=(40, 1), key="-FILE-"),
-            sg.FileBrowse(file_types=(('Text Files', '*.txt'),)),
+            sg.In(size=(35, 1), key="-FILE-"),
+            sg.FileBrowse(button_text = 'File',file_types=(('Text Files', '*.txt'),)),
+            sg.FolderBrowse(button_text ='Folder', target = (ThisRow,-2),key = '-FOB PARSE-'),
             sg.Button(button_text = 'Add', enable_events=True, key = '-ADD FILE-')
         ],
         [

@@ -115,7 +115,8 @@ def begin_audit(f, keys,save_name,exact):
         @type f: Str
         @param keys: ID list of parameters to parse from the file (add any number)
         @type keys: List[Str]
-        @param save_name: Name to save the parsed .json file as
+        @param save_name: Name to save the parsed .jso
+        n file as
         @type save_name: Str
         @param exact: True if the exact keyword is to be searched, False if a line containing the word is to be searched
         @type exact: Bool

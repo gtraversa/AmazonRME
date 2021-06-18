@@ -1,11 +1,10 @@
 import copy
-
 import os
 import json
 from exception_print import *
 
-def audit_file(f, keys, exact):
-    """ Parse .txt s7 file and extract desired features
+def audit_file_regular(f, keys, exact):
+    """ Parse old .txt s7 file and extract desired features
     
         @param f: File currently being parsed
         @type f: File
@@ -14,51 +13,69 @@ def audit_file(f, keys, exact):
     """
     full_data = {}
     data = {}
-    assign = None
+    assign = []
     load = None
     long_assign = []
     long_assign_flg = False
+    norm_assign_flg = False
     conv_num = None
     LAC_num = None
+    bad_word_check_list = [ 'interface','Latch','JAM','End','SAV','Baler','>',
+                        '<','Jam', 'Induct','BALER','Blade','Operating','MAC',
+                        'Disable','split','available','Merge','Function',
+                        'Interface','Cognex','Send','Prepare','Divert',
+                        'Point','Scanning','Lock','Position','Profile','Profinet',
+                        'Mapping','SCADA','Accel','Diagnostic','Windows',
+                        'waiting','Inward']
+    good_word_check_list = [ 'MT Conveyor Module','Belt Conveyor Module',
+                            'ACC Conveyor Module','KDR ACC Module','KDR MT Module',
+                            'TBT Module','Spiral Conveyor Module','Spiral Control Module',
+                            'Belt Curve Module']
     parameters = generate_parameter_dict(keys)
-
-    for line in f:#
+    for line in f:
         if 'TITLE' in line:
-            if 'LAC' in line:
+            if 'TITLE =LAC' in line:
                 data = {}
-                LAC_num = line.split('=')[1].split('-')[0].strip()
+                LAC_num = line.split('=')[1]
                 full_data[LAC_num] = data
-            else:
+            elif any(word in line  for word in good_word_check_list) and 'SEW' not in line:
                 conv_num = line.split('=')[1].strip()
-                if len(line.split('-')) != 2:
-                    conv_num = None
-                elif 'Conveyor' not in conv_num:
-                    conv_num = None
-                else:
-                    data[conv_num] = copy.deepcopy(parameters)
-    
+                data[conv_num] = copy.deepcopy(parameters)
+            else:
+                conv_num = None
+        
         if conv_num is not None:
-            if ' A' in line:
-                assign = line.strip().strip('A;').strip()
+            if ' A ' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' AN' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' O' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' ON' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
             if ' = ' in line:
-                load = line.split('=')[1].strip().strip('L;').strip()
-                if long_assign_flg:
-                    data[conv_num]['load_identity'][load]=long_assign[:-1]
-                    long_assign = []
-                    long_assign_flg = False
-                    load = None
-                    assign = None
+                load = line.split('=')[1].strip().strip('=L;').strip()
+                if norm_assign_flg:
+                    if long_assign_flg:
+                        assign.append(long_assign[:-1])
+                        long_assign_flg = False
+                        long_assign = []
+                    data[conv_num]['load_identity'][load]=assign
+                    assign = []
+                    norm_assign_flg = False
+                    load = False
+                    
             if long_assign_flg:
                 long_assign.append(line.strip().strip(';'))
 
             if 'A(' in line:
                 long_assign_flg = True
+                norm_assign_flg = True
             
-            if load is not None and assign is not None:
-                data[conv_num]['load_identity'][load]=assign.strip('"')
-                load= None
-                assign = None
-
             if 'CALL' in line:
                 data[conv_num]['Conveyor_model'] = line.split('_')[0].split('"')[1]+line.split('_')[1]
             for param in parameters.keys():
@@ -73,7 +90,7 @@ def audit_file(f, keys, exact):
                                 data[conv_num][param] = assign.strip('"')
                             except:
                                 data[conv_num][param] = assign
-                            load, assign = None, None
+                            load, assign = None, []
                         else:
                             data[conv_num][param] = line.split(':=')[1].strip(',').strip().strip(',')
                 else:
@@ -87,7 +104,7 @@ def audit_file(f, keys, exact):
                                 data[conv_num][parameter] = assign.strip('"')
                             except:
                                 data[conv_num][parameter] = assign
-                            load, assign = None, None
+                            load, assign = None, []
                         else:
                             try:
                                 data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
@@ -96,6 +113,106 @@ def audit_file(f, keys, exact):
     full_data[LAC_num] = data
     return full_data
 
+def audit_file_ARSAW(f,keys,exact):
+    """ Parse ARSAW .txt s7 file and extract desired features
+    
+        @param f: File currently being parsed
+        @type f: File
+        @param keys: ID list of parameters to parse from the file (add any number)
+        @type keys: List[Str]
+    """
+    full_data = {}
+    data = {}
+    assign = []
+    load = None
+    long_assign = []
+    long_assign_flg = False
+    norm_assign_flg = False
+    conv_num = None
+    LAC_num = None
+    parameters = generate_parameter_dict(keys)
+    #TODO chekc if long and normal assign work together and check compatibility with ARSAW
+    for line in f:
+        if 'FUNCTION ' in line:
+                data = {}
+                LAC_num = line.split('"')[1]
+                full_data[LAC_num] = data
+        if 'TITLE' in line:
+            if 'call FB SF' in line or 'call FB ACF' in line:
+                conv_num = line.split('=')[1].strip()
+                data[conv_num] = copy.deepcopy(parameters)
+    
+        if conv_num is not None:
+            if ' A ' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' AN' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' O' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            elif ' ON' in line and not long_assign_flg:
+                assign.append(line.strip().strip(';'))
+                norm_assign_flg = True
+            if ' = ' in line:
+                load = line.split('=')[1].strip().strip('=L;').strip()
+                if norm_assign_flg:
+                    if long_assign != []:
+                        assign.append(long_assign)
+                        long_assign_flg = False
+                        long_assign = []
+                    data[conv_num]['load_identity'][load]=assign
+                    assign = []
+                    norm_assign_flg = False
+                    load = False
+                    
+            if long_assign_flg:
+                long_assign.append(line.strip().strip(';'))
+                if ')' in line:
+                    long_assign_flg = False
+
+            if 'A(' in line:
+                long_assign.append('A(')
+                long_assign_flg = True
+                norm_assign_flg = True
+            
+            if 'CALL' in line:
+                data[conv_num]['Conveyor_model'] = line.split(',')[1].split('"')[1]
+            for param in parameters.keys():
+                search_word = ''
+                if exact:
+                    search_word = ' ' + param + ' '
+                    if search_word in line:
+                        if ':= L' in line:
+                            load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
+                            assign = data[conv_num]['load_identity'][load]
+                            try:
+                                data[conv_num][param] = assign.strip('"')
+                            except:
+                                data[conv_num][param] = assign
+                            load, assign = None, []
+                        else:
+                            data[conv_num][param] = line.split(':=')[1].strip(',').strip().strip(',')
+                else:
+                    search_word = param
+                    if search_word in line:
+                        parameter = line.split(':=')[0].strip()
+                        if ':= L' in line:
+                            load = line.split(':=')[1].strip().strip('L').strip(' L,);').strip()
+                            assign = data[conv_num]['load_identity'][load]
+                            try:
+                                data[conv_num][parameter] = assign.strip('"')
+                            except:
+                                data[conv_num][parameter] = assign
+                            load, assign = None, []
+                        else:
+                            try:
+                                data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
+                            except:
+                                 data[conv_num][parameter] = '?'
+    full_data[LAC_num] = data
+    return full_data
 
 def generate_parameter_dict(keys):
         """ Generate dictionary storing and identifying parameters
@@ -121,8 +238,12 @@ def begin_audit(f, keys,save_name,exact):
         @param exact: True if the exact keyword is to be searched, False if a line containing the word is to be searched
         @type exact: Bool
     """
+    data = {}
     try:
-        data = audit_file(open(f,'r'),keys, exact)
+        if 'ARSAW' in f:
+            data = audit_file_ARSAW(open(f,'r'),keys, exact)
+        else:
+            data = audit_file_regular(open(f,'r'),keys, exact)
     except Exception as e:
         PrintException()
         return 'Error'

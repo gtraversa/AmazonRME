@@ -42,7 +42,6 @@ while True:
             if values['-FILE-'] == '':
                 continue
             f = values["-FILE-"]
-            print(f)
             if isdir(f):
                 for fname in os.listdir(f):
                     if fname.endswith('.txt'):
@@ -56,7 +55,6 @@ while True:
                             disp_list.append(fname_disp.strip(',')+ ']')
                         fpath = f+'/'+ fname
                         file_list.append(fpath)
-                        print(file_list)
             else:
                 if len(keys) <1:
                     disp_list.append(f.split('/')[-1].strip('.txt'))
@@ -175,11 +173,9 @@ while True:
                 exact = True
             if len(keys)>0:
                 for i,f in enumerate(file_list):
-                    audit_path[str(disp_list[i])] = begin_audit(f,keys,disp_list[i],exact)
-                for key,value in audit_path.items():
-                    if value == 'Error':
-                        del audit_path[key]
-                        continue
+                    parsed_file = begin_audit(f,keys,disp_list[i],exact)
+                    if parsed_file != 'Error':
+                        audit_path[str(disp_list[i])] = parsed_file
                 update_values_stuff(['-PARSED FILE SELECT-','-PARSED FILE SELECT SEARCHABLE-',
                                     '-PARSED FILE SELECT EXPANDABLE-'], disp_list+disp_list_load, window)
                 enable_stuff(['-PARSED FILE SELECT-','-PARSED FILE SELECT EXPANDABLE-',

@@ -23,7 +23,7 @@ def make_window():
                 button_text='Remove', key="-REMOVE FILE-"
             ),
             sg.Button(
-                button_text='Clear', key="-CLEAR FILES-"
+                button_text='Clear', key="-CLEAR FILES-",button_color='red'
             )
         ],
     ]
@@ -48,7 +48,7 @@ def make_window():
                 button_text='Remove', key="-REMOVE KEY-"
             ),
             sg.Button(
-                button_text='Clear', key="-CLEAR KEYS-"
+                button_text='Clear', key="-CLEAR KEYS-",button_color='red'
             ),
             sg.Checkbox('Exact', key ='-EXACT CB-', default = False),
         ],
@@ -69,7 +69,7 @@ def make_window():
         [
             sg.Button(button_text='All with keyword',key = '-ALL KW-', enable_events = True),
             sg.Button(button_text='All without keyword',key = '-ALL NO KW-',enable_events = True),
-            sg.Button(button_text = 'Clear',key = '-CLEAR FULL OUTPUT-')
+            sg.Button(button_text = 'Clear',key = '-CLEAR FULL OUTPUT-',button_color='red')
         ],
         [
             sg.Multiline(
@@ -94,7 +94,7 @@ def make_window():
             ),
         ],
         [
-            sg.Button(button_text = 'Clear',key = '-CLEAR EXPANDABLE OUTPUT-'),
+            sg.Button(button_text = 'Clear',key = '-CLEAR EXPANDABLE OUTPUT-',button_color='red'),
             sg.Button(button_text = 'Collapse', key = '-COLLAPSE EXPANDABLE OUTPUT-')
         ],
     ]
@@ -138,8 +138,9 @@ def make_window():
             sg.Button(button_text = 'Search',key = '-SEARCH SEARCHABLE OUTPUT-'),
             sg.Checkbox('Keep previous searches', default=False, k='-MULTI SEARCH CB-'),
         ],
-        [
-            sg.Button(button_text = 'Clear',key = '-CLEAR SEARCHABLE OUTPUT-')
+        [   
+            sg.Button(button_text = 'Export', enable_events = True, key = '-SEARCHABLE EXPORT-'),
+            sg.Button(button_text = 'Clear',key = '-CLEAR SEARCHABLE OUTPUT-',button_color='red')
         ],
     ]
 
@@ -210,7 +211,7 @@ def make_window():
                     button_text='Remove', key="-REMOVE FILE LOAD-",pad = ((80,0),(0,0))
                 ),
                 sg.Button(
-                    button_text='Clear', key="-CLEAR FILES LOAD-"
+                    button_text='Clear', key="-CLEAR FILES LOAD-",button_color='red'
                 )
             ],
     ]

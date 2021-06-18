@@ -126,7 +126,26 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
                             if '       ->' + conv == target[0] or conv in [key.strip().strip('->') for key in expanded_keys if key is not None]:
                                 del f[lac][conv]['load_identity']
                                 for key in f[lac][conv].keys():
-                                    vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
+                                    if 'Conveyor' in key:
+                                        vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
+                                    else:
+                                        try:
+                                            if str(type(f[lac][conv][key][0])) == "<class 'list'>":
+                                                vals.append('                ->' + key + ' : ' +str(f[lac][conv][key][0][0]))
+                                                for thing in f[lac][conv][key][0][1:]:
+                                                    vals.append('                                               '+ str(thing))
+                                                    continue
+                                            else:
+                                                vals.append('                ->' + key + ' : ' +str(f[lac][conv][key][0]))
+                                            for item in f[lac][conv][key][1:]:
+                                                if str(type(item)) == "<class 'list'>":
+                                                    for thing in item:
+                                                        vals.append('                                               '+ str(thing))
+                                                else:
+                                                    vals.append('                                               '+ str(item))
+                                        except Exception as e:
+                                            print(e)
+                                            vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
                                
                 update_values_stuff(['-EXPANDABLE OUTPUT-'],vals,window)
         return expanded_keys #TODO add side scrolling for expandavble output

@@ -217,9 +217,11 @@ def export_all(audit_path,save_path):
         @type save_path: Str
 
     """
-    pass
+    for name,path in audit_path.items():
+        export_selected(path,name,save_path)
 
-def export_select(values, save_path):
+
+def export_displayed(values, save_path):
     """ Export displayed files to .txt 
 
         @param value: Values to extract title and info from

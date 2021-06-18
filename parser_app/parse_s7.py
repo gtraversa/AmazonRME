@@ -61,7 +61,7 @@ def audit_file_regular(f, keys, exact):
                 load = line.split('=')[1].strip().strip('=L;').strip()
                 if norm_assign_flg:
                     if long_assign_flg:
-                        assign.append(long_assign[:-1])
+                        assign.append(long_assign)
                         long_assign_flg = False
                         long_assign = []
                     data[conv_num]['load_identity'][load]=assign
@@ -73,6 +73,12 @@ def audit_file_regular(f, keys, exact):
                 long_assign.append(line.strip().strip(';'))
 
             if 'A(' in line:
+                long_assign.append('A(')
+                long_assign_flg = True
+                norm_assign_flg = True
+
+            if 'O(' in line:
+                long_assign.append('O(')
                 long_assign_flg = True
                 norm_assign_flg = True
             
@@ -176,6 +182,11 @@ def audit_file_ARSAW(f,keys,exact):
                 long_assign.append('A(')
                 long_assign_flg = True
                 norm_assign_flg = True
+
+            if 'O(' in line:
+                long_assign.append('O(')
+                long_assign_flg = True
+                norm_assign_flg = True
             
             if 'CALL' in line:
                 data[conv_num]['Conveyor_model'] = line.split(',')[1].split('"')[1]
@@ -206,11 +217,11 @@ def audit_file_ARSAW(f,keys,exact):
                             except:
                                 data[conv_num][parameter] = assign
                             load, assign = None, []
-                        else:
+                        elif ':=' in line:
                             try:
                                 data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
                             except:
-                                 data[conv_num][parameter] = '?'
+                                pass
     full_data[LAC_num] = data
     return full_data
 

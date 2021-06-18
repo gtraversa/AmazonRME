@@ -105,11 +105,11 @@ def audit_file_regular(f, keys, exact):
                             except:
                                 data[conv_num][parameter] = assign
                             load, assign = None, []
-                        else:
+                        elif ':=' in line:
                             try:
                                 data[conv_num][parameter] = line.split(':=')[1].strip(',').strip().strip(',')
-                            except:
-                                 data[conv_num][parameter] = '?'
+                            except Exception as e:
+                                print(e)
     full_data[LAC_num] = data
     return full_data
 

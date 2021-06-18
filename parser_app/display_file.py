@@ -189,6 +189,45 @@ def kw_display(path, window,kw_select):
     except Exception as e:
         window['-FULL OUTPUT-'].print(e)
 
+def export_selected(file_path,file_name,save_path):
+    """ Export selected file to .txt 
+
+        @param file_path: Path to parsed .json
+        @type file_path: Str
+        @param file_name: Name for the file to be saved as
+        @type file_name: Str
+        @param save_path: path to save the .txt file to
+        @type save_path: Str
+    """
+    with open(file_path) as jfile:
+        with open(save_path+'/'+file_name+'.txt','w') as w:
+            f = json.load(jfile)
+            for lac in copy.deepcopy(f).keys():
+                for conv in  copy.deepcopy(f)[lac]:
+                    del f[lac][conv]['load_identity']
+            w.write(json.dumps(f, indent = 4).replace('"','').replace('\\',''))
+
+
+def export_all(audit_path,save_path):
+    """ Export all parsed files to .txt 
+
+        @param audit_path: All paths to audited files
+        @type audit_path: Dict
+        @param save_path: ath to save the .txt files to
+        @type save_path: Str
+
+    """
+    pass
+
+def export_select(values, save_path):
+    """ Export displayed files to .txt 
+
+        @param value: Values to extract title and info from
+        @type values: Values dict from PySimpleGUI
+        @param save_path: Path to save the .txt files to
+        @type save_path: Str
+    """
+    pass
 
 def extract_keys_load(path):
     """ Retrieve keys from file path for displaying

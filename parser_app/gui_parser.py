@@ -16,7 +16,6 @@ import webbrowser
 """
 
 window = layout_elements.make_window()
-
 set_cursor(stuff = ['-ADD FILE-','-ADD KEY-','-REMOVE KEY-','-FILE LIST-','-REMOVE FILE-','-CLEAR FILES-',
                 '-CLEAR KEYS-','-PARSED FILE SELECT-','-ALL KW-','-ALL NO KW-','-CLEAR FULL OUTPUT-','-EXTRACT KEYS-',
                 '-PARSED FILE SELECT EXPANDABLE-','-CLEAR EXPANDABLE OUTPUT-','-COLLAPSE EXPANDABLE OUTPUT-',
@@ -24,7 +23,7 @@ set_cursor(stuff = ['-ADD FILE-','-ADD KEY-','-REMOVE KEY-','-FILE LIST-','-REMO
                 '-PARSED CONVEYOR SELECT SEARCHABLE-','-SEARCH SEARCHABLE OUTPUT-','-MULTI SEARCH CB-','-CLEAR SEARCHABLE OUTPUT-',
                 '-FB PARSED-','-FOB PARSED-','-FILE LIST LOAD-','-LOAD-','-REMOVE FILE LOAD-','-CLEAR FILES LOAD-','-COPYRIGHT-'],cursor='hand2', window =window)
 
-# Run the Event Loop
+#TODO add support for 302-303-403-404 ( sorters have different syntax)
 file_list = []
 file_list_load = []
 disp_list = []
@@ -258,6 +257,20 @@ while True:
                     '-EXPANDABLE OUTPUT-','-PARSED FILE SELECT SEARCHABLE-','-PARSED FILE SELECT-',
                     '-PARSED FILE SELECT EXPANDABLE-']
             clear_stuff(stuff,window)
+
+        elif event == '-FULL EXPORT-':
+            path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
+            file_to_save = audit_path[values['-PARSED FILE SELECT-']]
+            file_name = values['-PARSED FILE SELECT-']
+            export_selected(file_to_save,file_name,path)
+
+        elif event == '-FULL EXPORT ALL-':
+            path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
+            pass
+
+        elif event == '-SELECTABLE EXPORT-':
+            path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
+            pass
 
         elif event == '-COPYRIGHT-':
             url = 'https://github.com/gtraversa/AmazonRME'

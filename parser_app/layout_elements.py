@@ -40,7 +40,7 @@ def make_window():
                 values=[], enable_events=True, size=(58, 5), key="-KEY LIST-"
             ),
             sg.Button(
-                button_text='Parse', key='-PARSE-', size=(5, 3)
+                button_text='Parse', key='-PARSE-', size=(5, 3), button_color='green'
             ),
         ],
         [
@@ -77,9 +77,14 @@ def make_window():
                key='-KEYS DISPLAY-',
                disabled=True
             ),
+            
             sg.Button(button_text = 'Extract keys', enable_events= True, key ='-EXTRACT KEYS-')
+        ],
+        [
+            sg.Button(button_text = 'Export Selecte', enable_events = True, key = '-FULL EXPORT-'),
+            sg.Button(button_text = 'Export All', enable_events = True, key = '-FULL EXPORT ALL-'),
         ]
-    ]
+    ] 
 
     selection_expandable_display = [
         [
@@ -189,7 +194,7 @@ def make_window():
             [
             sg.Text("Select File"),
             sg.In(size=(110, 1), key="-JSON FILE-"),
-            sg.FileBrowse(button_text ='File',file_types=(('Text Files', '*.json'),),key = '-FB PARSED-'),
+            sg.FileBrowse(button_text ='File',file_types=(('Json Files', '*.json'),),key = '-FB PARSED-'),
             sg.FolderBrowse(button_text ='Folder', target = (ThisRow,-2),key = '-FOB PARSED-'),
             sg.Button(button_text = 'Add', enable_events=True, key = '-ADD PARSED-')
             ],
@@ -202,7 +207,7 @@ def make_window():
                 pad = ((80,5),(0,5))
             ), 
             sg.Button(
-                button_text='Load', key='-LOAD-', size=(5, 3)
+                button_text='Load', key='-LOAD-', size=(5, 3), button_color='green'
             ),
 
             ],

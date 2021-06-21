@@ -72,12 +72,12 @@ def audit_file_regular(f, keys, exact):
             if long_assign_flg:
                 long_assign.append(line.strip().strip(';'))
 
-            if 'A(' in line:
+            if 'A(' in line and not long_assign_flg:
                 long_assign.append('A(')
                 long_assign_flg = True
                 norm_assign_flg = True
 
-            if 'O(' in line:
+            if 'O(' in line and not long_assign_flg:
                 long_assign.append('O(')
                 long_assign_flg = True
                 norm_assign_flg = True
@@ -178,12 +178,12 @@ def audit_file_ARSAW(f,keys,exact):
                 if ')' in line:
                     long_assign_flg = False
 
-            if 'A(' in line:
+            if 'A(' in line and not long_assign_flg:
                 long_assign.append('A(')
                 long_assign_flg = True
                 norm_assign_flg = True
 
-            if 'O(' in line:
+            if 'O(' in line and not long_assign_flg:
                 long_assign.append('O(')
                 long_assign_flg = True
                 norm_assign_flg = True

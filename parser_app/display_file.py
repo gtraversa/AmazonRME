@@ -221,7 +221,7 @@ def export_all(audit_path,save_path):
         export_selected(path,name,save_path)
 
 
-def export_displayed(values, save_path):
+def export_displayed(values,display,save_path):
     """ Export displayed files to .txt 
 
         @param value: Values to extract title and info from
@@ -229,16 +229,19 @@ def export_displayed(values, save_path):
         @param save_path: Path to save the .txt files to
         @type save_path: Str
     """
-    output = values['-SEARCHABLE OUTPUT-']
-    fselect = values['-PARSED FILE SELECT SEARCHABLE-']
-    lacselect = values['-PARSED LAC SELECT SEARCHABLE-']
-    convselect = values['-PARSED CONVEYOR SELECT SEARCHABLE-']
-    if values['-ALL CONV CB-']:
-        convselect = 'All'
-    if not values['-MULTI SEARCH CB-']:
-        file_name = (fselect+'['+lacselect+']'+'[' + convselect+'].txt').replace(' ','').replace('\n','')
+    output = values[display]
+    if display == '-EXPANDABLE OUTPUT-':
+        fselect = values['-PARSED FILE SELECT SEARCHABLE-']
+        lacselect = values['-PARSED LAC SELECT SEARCHABLE-']
+        convselect = values['-PARSED CONVEYOR SELECT SEARCHABLE-']
+        if values['-ALL CONV CB-']:
+            convselect = 'All'
+        if not values['-MULTI SEARCH CB-']:
+            file_name = (fselect+'['+lacselect+']'+'[' + convselect+'].txt').replace(' ','').replace('\n','')
+        else:
+            file_name = 'MULTIPLE.txt'
     else:
-        file_name = 'MULTIPLE.txt'
+        file_name = values['-PARSED FILE SELECT-']+'_displayed.txt'
 
     with open(save_path+'/'+file_name,'w') as w:
         w.write(output)

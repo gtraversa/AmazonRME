@@ -270,7 +270,11 @@ while True:
 
         elif event == '-SEARCHABLE EXPORT-':
             path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
-            export_displayed(values, path)
+            export_displayed(values,'-EXPANDABLE OUTPUT-', path)
+        
+        elif event == '-FULL EXPORT DISPLAYED-':
+            path = path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
+            export_displayed(values,'-FULL OUTPUT-',path)
 
         elif event == '-COPYRIGHT-':
             url = 'https://github.com/gtraversa/AmazonRME'

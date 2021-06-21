@@ -81,8 +81,10 @@ def make_window():
             sg.Button(button_text = 'Extract keys', enable_events= True, key ='-EXTRACT KEYS-')
         ],
         [
-            sg.Button(button_text = 'Export Selecte', enable_events = True, key = '-FULL EXPORT-'),
+            sg.Button(button_text = 'Export Selected', enable_events = True, key = '-FULL EXPORT-'),
+            sg.Button(button_text = 'Export Displayed', enable_events = True, key = '-FULL EXPORT DISPLAYED-'),
             sg.Button(button_text = 'Export All', enable_events = True, key = '-FULL EXPORT ALL-'),
+            
         ]
     ] 
 

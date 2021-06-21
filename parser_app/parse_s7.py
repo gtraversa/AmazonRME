@@ -139,7 +139,6 @@ def audit_file_ARSAW(f,keys,exact):
     conv_num = None
     LAC_num = None
     parameters = generate_parameter_dict(keys)
-    #TODO chekc if long and normal assign work together and check compatibility with ARSAW
     for line in f:
         if 'FUNCTION ' in line:
                 data = {}

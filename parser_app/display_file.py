@@ -148,7 +148,7 @@ def expandable_display(path,depth,window,expanded_keys,target = [None]):
                                             vals.append('                ->' + key + ' : ' +str(f[lac][conv][key]))
                                
                 update_values_stuff(['-EXPANDABLE OUTPUT-'],vals,window)
-        return expanded_keys #TODO add side scrolling for expandavble output
+        return expanded_keys #TODO add side scrolling for expandable output
     except Exception as e:
         print(e)
 
@@ -229,7 +229,19 @@ def export_displayed(values, save_path):
         @param save_path: Path to save the .txt files to
         @type save_path: Str
     """
-    pass
+    output = values['-SEARCHABLE OUTPUT-']
+    fselect = values['-PARSED FILE SELECT SEARCHABLE-']
+    lacselect = values['-PARSED LAC SELECT SEARCHABLE-']
+    convselect = values['-PARSED CONVEYOR SELECT SEARCHABLE-']
+    if values['-ALL CONV CB-']:
+        convselect = 'All'
+    if not values['-MULTI SEARCH CB-']:
+        file_name = (fselect+'['+lacselect+']'+'[' + convselect+'].txt').replace(' ','').replace('\n','')
+    else:
+        file_name = 'MULTIPLE.txt'
+
+    with open(save_path+'/'+file_name,'w') as w:
+        w.write(output)
 
 def extract_keys_load(path):
     """ Retrieve keys from file path for displaying

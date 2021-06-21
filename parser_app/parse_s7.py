@@ -27,10 +27,12 @@ def audit_file_regular(f, keys, exact):
                         'Point','Scanning','Lock','Position','Profile','Profinet',
                         'Mapping','SCADA','Accel','Diagnostic','Windows',
                         'waiting','Inward']
-    good_word_check_list = [ 'MT Conveyor Module','Belt Conveyor Module',
+    good_word_check_list = ['MT Conveyor Module','Belt Conveyor Module',
                             'ACC Conveyor Module','KDR ACC Module','KDR MT Module',
                             'TBT Module','Spiral Conveyor Module','Spiral Control Module',
-                            'Belt Curve Module']
+                            'Belt Curve Module', 'Measuring conveyor','(SEW)',
+                            'Gapping belt','Index belt','Slugging conveyor',
+                            'discharge conveyor', 'Belt Conveyor','MT Conveyor','ACC Conveyor']
     parameters = generate_parameter_dict(keys)
     for line in f:
         if 'TITLE' in line:
@@ -38,7 +40,7 @@ def audit_file_regular(f, keys, exact):
                 data = {}
                 LAC_num = line.split('=')[1]
                 full_data[LAC_num] = data
-            elif any(word in line  for word in good_word_check_list) and 'SEW' not in line:
+            elif any(word in line  for word in good_word_check_list) and 'Latch' not in line:
                 conv_num = line.split('=')[1].strip()
                 data[conv_num] = copy.deepcopy(parameters)
             else:

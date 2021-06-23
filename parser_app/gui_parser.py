@@ -266,7 +266,7 @@ while True:
 
         elif event == '-FULL EXPORT ALL-':
             path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)
-            export_all(audit_path,path)
+            export_all(audit_path,save_path = path, disp_list = disp_list+disp_list_load)
 
         elif event == '-SEARCHABLE EXPORT-':
             path = sg.popup_get_folder('Select folder for saving:', keep_on_top=True)

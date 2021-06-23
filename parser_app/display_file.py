@@ -219,7 +219,7 @@ def export_selected(file_path,file_name,save_path):
         pdf.output(save_path + '/Exported/PDF/'+ file_name + '.pdf')
 
 
-def export_all(audit_path,save_path):
+def export_all(audit_path,disp_list,save_path):
     """ Export all parsed files to .txt 
 
         @param audit_path: All paths to audited files
@@ -228,8 +228,8 @@ def export_all(audit_path,save_path):
         @type save_path: Str
 
     """
-    for name,path in audit_path.items():
-        export_selected(path,name,save_path)
+    for f in  disp_list:
+        export_selected(audit_path[str(f)],f,save_path)
 
 
 def export_displayed(values,display,save_path):

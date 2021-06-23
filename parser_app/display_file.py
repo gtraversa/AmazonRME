@@ -2,6 +2,8 @@ import PySimpleGUI as sg
 import json
 import copy
 from os.path import isdir
+import os
+from fpdf import FPDF
 
 """Assistance functions to streamline main GUI program"""
 
@@ -199,13 +201,22 @@ def export_selected(file_path,file_name,save_path):
         @param save_path: path to save the .txt file to
         @type save_path: Str
     """
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size = 12)
+    os.makedirs(save_path+'/Exported', exist_ok = True)
     with open(file_path) as jfile:
-        with open(save_path+'/'+file_name+'.txt','w') as w:
+        with open(save_path+'/Exported/'+file_name+'.txt','w') as w:
             f = json.load(jfile)
             for lac in copy.deepcopy(f).keys():
                 for conv in  copy.deepcopy(f)[lac]:
                     del f[lac][conv]['load_identity']
             w.write(json.dumps(f, indent = 4).replace('"','').replace('\\',''))
+    os.makedirs(save_path+'/Exported/PDF', exist_ok = True)
+    with open(save_path+'/Exported/'+file_name + '.txt','r') as r:
+        for line in r:
+            pdf.cell(0,5,txt = line, ln = 1, align = 'L')
+        pdf.output(save_path + '/Exported/PDF/'+ file_name + '.pdf')
 
 
 def export_all(audit_path,save_path):
@@ -226,9 +237,15 @@ def export_displayed(values,display,save_path):
 
         @param value: Values to extract title and info from
         @type values: Values dict from PySimpleGUI
+        @param display: Which display to take the data to export from
+        @type display: Str
         @param save_path: Path to save the .txt files to
         @type save_path: Str
     """
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size = 12)
     output = values[display]
     if display == '-EXPANDABLE OUTPUT-':
         fselect = values['-PARSED FILE SELECT SEARCHABLE-']
@@ -237,14 +254,19 @@ def export_displayed(values,display,save_path):
         if values['-ALL CONV CB-']:
             convselect = 'All'
         if not values['-MULTI SEARCH CB-']:
-            file_name = (fselect+'['+lacselect+']'+'[' + convselect+'].txt').replace(' ','').replace('\n','')
+            file_name = (fselect+'['+lacselect+']'+'[' + convselect+']').replace(' ','').replace('\n','')
         else:
-            file_name = 'MULTIPLE.txt'
+            file_name = 'MULTIPLE'
     else:
-        file_name = values['-PARSED FILE SELECT-']+'_displayed.txt'
-
-    with open(save_path+'/'+file_name,'w') as w:
+        file_name = values['-PARSED FILE SELECT-']+'_displayed'
+    os.makedirs(save_path+'/Exported', exist_ok = True)
+    with open(save_path+'/Exported/'+file_name + '.txt','w+') as w:
         w.write(output)
+    os.makedirs(save_path+'/Exported/PDF', exist_ok = True)
+    with open(save_path+'/Exported/'+file_name + '.txt','r') as r:
+        for line in r:
+            pdf.cell(0,5,txt = line, ln = 1, align = 'L')
+        pdf.output(save_path + '/Exported/PDF/'+ file_name + '.pdf')
 
 def extract_keys_load(path):
     """ Retrieve keys from file path for displaying

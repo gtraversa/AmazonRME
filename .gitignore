@@ -12,3 +12,4 @@ parser_app/build
 *.spec
 test.py
 *.txt
+*.pdf

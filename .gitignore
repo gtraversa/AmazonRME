@@ -13,3 +13,4 @@ parser_app/build
 test.py
 *.txt
 *.pdf
+*.csv

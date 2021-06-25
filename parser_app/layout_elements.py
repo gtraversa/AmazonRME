@@ -222,6 +222,11 @@ def make_window():
                 )
             ],
     ]
+    tree_data = sg.TreeData()
+    tree_test = [
+        [sg.Tree(data = tree_data,)],
+        
+    ]
 
 
     layout = [
@@ -233,7 +238,8 @@ def make_window():
         [sg.TabGroup([[
                         sg.Tab('Full', full_display,key = '-FULL TAB-'),
                         sg.Tab('Expandable', expandable_display,key = '-EXPANDABLE TAB-'),
-                        sg.Tab('Searchable', searchable_display,key = '-SEARCHABLE TAB-')
+                        sg.Tab('Searchable', searchable_display,key = '-SEARCHABLE TAB-'),
+                        sg.Tab('Tree test',tree_test),
                     ]],enable_events=True,key = '-DISPLAY TAB-', size = (1000,335)),
                     
         ],

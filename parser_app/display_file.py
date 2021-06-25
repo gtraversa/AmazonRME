@@ -1,4 +1,3 @@
-import PySimpleGUI as sg
 import json
 import copy
 from os.path import isdir

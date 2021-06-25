@@ -1,9 +1,9 @@
 import PySimpleGUI as sg
-import layout_elements
+from .layout_elements import make_window
 import os
 from os.path import isdir
-from parse_s7 import *
-from display_file import *
+from .parse_s7 import *
+from .display_file import *
 import webbrowser
 
 """ GUI for Siemens S7 FC parser
@@ -15,7 +15,7 @@ import webbrowser
     Amazon EMA1, Derbishire, UK.
 """
 
-window = layout_elements.make_window()
+window = make_window()
 set_cursor(stuff = ['-ADD FILE-','-ADD KEY-','-REMOVE KEY-','-FILE LIST-','-REMOVE FILE-','-CLEAR FILES-',
                 '-CLEAR KEYS-','-PARSED FILE SELECT-','-ALL KW-','-ALL NO KW-','-CLEAR FULL OUTPUT-','-EXTRACT KEYS-',
                 '-PARSED FILE SELECT EXPANDABLE-','-CLEAR EXPANDABLE OUTPUT-','-COLLAPSE EXPANDABLE OUTPUT-',
